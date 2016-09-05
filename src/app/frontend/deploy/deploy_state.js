@@ -19,4 +19,4 @@ export const deployAppStateName = 'deployApp';
 
 export const deployFileStateName = 'deployFile';
 
-export const deployChartName = 'deployChart';
+export const deployChartStateName = 'deployChart';
