@@ -152,7 +152,7 @@ export default class DeployFromChartController {
                  },
                  {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
                   "name": "PostgresSQL",
-                  "description": "An postgresql database",
+                  "description": "An postgresql sample database app",
                  },
                  {"icon": "http://design.jboss.org/wildfly/logo/final/wildfly_logo_stacked_600px.png",
                   "name": "Wildfly App 1",
@@ -175,7 +175,7 @@ export default class DeployFromChartController {
       this.charts = [
                {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
                 "name": "PostgresSQL",
-                "description": "An postgresql database",
+                "description": "An postgresql sample database app",
                 "selected": "",
                },
               ];
