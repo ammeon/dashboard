@@ -66,6 +66,13 @@ export default class DeployFromChartController {
 
     /** @export */
     this.i18n = i18n;
+
+    /**
+     * List of available repository.
+     * @export {!Array<string>}
+     */
+    this.repos = ["None", "kubernetes-charts", "ammeon-charts"];
+
   }
 
   /**
@@ -117,12 +124,42 @@ export default class DeployFromChartController {
    * @export
    */
   cancel() { this.kdHistoryService_.back(workloads); }
+
+  /**
+   * Cancels the deployment form.
+   * @export
+   */
+  selectedChart(chart) { alert("chart '" + chart + "' has been selected!!!") }
 }
 
 const i18n = {
   /** @export {string} @desc Label "Chart Repository" label, for the chart repository on the deploy
    *  from chart page. */
   MSG_CHART_REPOSITORY_LABEL: goog.getMsg('Chart Repository'),
+
+  /** @export {string} @desc User help for chart repository selection on the deploy from chart page.
+     */
+  MSG_DEPLOY_CHART_REPO_USER_HELP: goog.getMsg(`Select a Chart Repository.`),
+
+  /** @export {string} @desc User help for chart selection on the deploy from chart page.
+     */
+  MSG_DEPLOY_CHART_USER_HELP: goog.getMsg(`Select a Chart to deploy.`),
+
+  /** @export {string} @desc Label "Release Name" label, for the release name on the deploy
+   *  from chart page. */
+  MSG_DEPLOY_CHART_RELEASE_NAME_LABEL: goog.getMsg('Release Name'),
+  
+  /** @export {string} @desc User help for chart release name on the deploy from chart page.
+     */
+  MSG_DEPLOY_CHART_RELEASE_NAME_USER_HELP: goog.getMsg(`Optionally, specify a release name.`),
+
+  /** @export {string} @desc Label "Custom values YAML file", for the custom values file on the deploy
+   *  from chart page. */
+  MSG_DEPLOY_CHART_VALUES_YAML_FILE_LABEL: goog.getMsg('Custom Values YAML file'),
+
+  /** @export {string} @desc User help for chart custom values on the deploy from chart page.
+     */
+  MSG_DEPLOY_CHART_CUSTOM_VALUES_USER_HELP: goog.getMsg(`Optionally, specify a custom values file.`),
 
   /** @export {string} @desc The text is put on the button at the end of the chart deploy
    * page. */
