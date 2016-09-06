@@ -67,11 +67,23 @@ export default class DeployFromChartController {
     /** @export */
     this.i18n = i18n;
 
+    /** @export */
+    this.selectedClass = "kd-chart-card-selected";
+
+    /** @export */
+    this.selectedChart;
+
     /**
      * List of available repository.
      * @export {!Array<string>}
      */
     this.repos = ["None", "kubernetes-charts", "ammeon-charts"];
+
+    /**
+     * List of available charts.
+     * @export {!Array<string>}
+     */
+    this.charts = [];
 
   }
 
@@ -125,11 +137,67 @@ export default class DeployFromChartController {
    */
   cancel() { this.kdHistoryService_.back(workloads); }
 
+
   /**
-   * Cancels the deployment form.
+   * Selects a chart repository.
    * @export
    */
-  selectedChart(chart) { alert("chart '" + chart + "' has been selected!!!") }
+  selectRepo(repoName) {
+    
+    if (repoName == "ammeon-charts") {
+      this.charts = [{"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
+                  "name": "Example App 1",
+                  "description": "Example App with sample app",
+                  "selected": "",
+                 },
+                 {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
+                  "name": "PostgresSQL",
+                  "description": "An postgresql database",
+                 },
+                 {"icon": "http://design.jboss.org/wildfly/logo/final/wildfly_logo_stacked_600px.png",
+                  "name": "Wildfly App 1",
+                  "description": "Example App with Activemq",
+                  "selected": "",
+                 },
+                 {"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
+                  "name": "Wildfly App 2",
+                  "description": "Example App with Activemq",
+                  "selected": "",
+                 },
+                 {"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
+                  "name": "Wildfly App 3",
+                  "description": "Example App with Activemq",
+                  "selected": "",
+                 },
+                ];
+    }
+    if (repoName == "kubernetes-charts") {
+      this.charts = [
+               {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
+                "name": "PostgresSQL",
+                "description": "An postgresql database",
+                "selected": "",
+               },
+              ];
+    }
+    if (repoName == "None") {
+      this.charts = [];
+    }
+  }
+
+  /**
+   * Selects a chart to deploy.
+   * @export
+   */
+  selectChart(chartName) {
+    for (var i = 0; i < this.charts.length; i++) { 
+      this.charts[i]["selected"] = "";
+      if (this.charts[i]["name"] == chartName) {
+        this.charts[i]["selected"] = this.selectedClass;  
+      }
+    }
+    this.selectedChart = chartName;
+  }
 }
 
 const i18n = {

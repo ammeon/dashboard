@@ -22,8 +22,8 @@ limitations under the License.
       <kd-help-section>
       <md-input-container class="md-block">
         <label>{{::ctrl.i18n.MSG_CHART_REPOSITORY_LABEL}}</label>
-        <md-select ng-model="ctrl.namespace" ng-click="ctrl.resetImagePullSecret()" required>
-          <md-option ng-repeat="repo in ctrl.repos" ng-value="repo">
+        <md-select ng-model="ctrl.namespace" >
+          <md-option ng-repeat="repo in ctrl.repos" ng-value="repo" ng-click="ctrl.selectRepo(repo)">
             {{repo}}
           </md-option>
         </md-select>
@@ -34,75 +34,15 @@ limitations under the License.
     </kd-help-section>
     <kd-help-section>
 
-      <md-grid-list md-cols="3" md-row-height="200px" md-gutter="2em">
+      <md-grid-list md-cols="3" md-row-height="250px" md-gutter="2em">
 
-          <md-grid-tile>
-            <md-card ng-click="ctrl.selectedChart('Wildfly App 1')">
-              <md-card-header>
-                <md-card-avatar>
-                  <img class="md-user-avatar" src="https://deis.com/assets/images/svg/helm-logo.svg">
-                </md-card-avatar>
-              </md-card-header>
-              <md-card-title-text>
-                <span class="md-headline">Wildfly App 1</span>
-                <span class="md-subhead">Example App with Activemq</span>
-              </md-card-title-text>
-            </md-card>
-          </md-grid-tile>
-
-          <md-grid-tile>
-            <md-card ng-click="ctrl.selectedChart('Wildfly App 2')">
-              <md-card-header>
-                <md-card-avatar>
-                  <img class="md-user-avatar" src="https://deis.com/assets/images/svg/helm-logo.svg">
-                </md-card-avatar>
-              </md-card-header>
-              <md-card-title-text>
-                <span class="md-headline">Wildfly App 2</span>
-                <span class="md-subhead">Example App with Activemq</span>
-              </md-card-title-text>
-            </md-card>
-          </md-grid-tile>
-
-          <md-grid-tile>
-            <md-card ng-click="ctrl.selectedChart('Wildfly App 3')">
-              <md-card-header>
-                <md-card-avatar>
-                  <img class="md-user-avatar" src="https://deis.com/assets/images/svg/helm-logo.svg">
-                </md-card-avatar>
-              </md-card-header>
-              <md-card-title-text>
-                <span class="md-headline">Wildfly App 3</span>
-                <span class="md-subhead">Example App with Activemq</span>
-              </md-card-title-text>
-            </md-card>
-          </md-grid-tile>
-
-          <md-grid-tile>
-            <md-card ng-click="ctrl.selectedChart('Wildfly App 4')">
-              <md-card-header>
-                <md-card-avatar>
-                  <img class="md-user-avatar" src="https://deis.com/assets/images/svg/helm-logo.svg">
-                </md-card-avatar>
-              </md-card-header>
-              <md-card-title-text>
-                <span class="md-headline">Wildfly App 4</span>
-                <span class="md-subhead">Example App with Activemq</span>
-              </md-card-title-text>
-            </md-card>
-          </md-grid-tile>
-
-          <md-grid-tile>
-            <md-card ng-click="ctrl.selectedChart('Wildfly App 5')">
-              <md-card-header>
-                <md-card-avatar>
-                  <img class="md-user-avatar" src="https://deis.com/assets/images/svg/helm-logo.svg">
-                </md-card-avatar>
-              </md-card-header>
-              <md-card-title-text>
-                <span class="md-headline">Wildfly App 5</span>
-                <span class="md-subhead">Example App with Activemq</span>
-              </md-card-title-text>
+          <md-grid-tile ng-repeat="chart in ctrl.charts" ng-value="chart">
+            <md-card class="kd-chart-card {{chart.selected}}" ng-click="ctrl.selectChart(chart.name)">
+              <md-card-content>
+                <img class="kd-chart-card-icon-image" src="{{chart.icon}}"/>
+                <h2 class="kd-chart-card-text-name">{{chart.name}}</h2>
+                <p class="kd-chart-card-text-description kd-chart-color-secondary">{{chart.description}}</p>
+              </md-card-content>
             </md-card>
           </md-grid-tile>
 
@@ -146,6 +86,7 @@ limitations under the License.
     </kd-user-help>
   </kd-help-section>
 
+  <!-- TODO: add support for cutom values file...
   <kd-help-section>
     <div layout="row" layout-align="space-between start">
       <div flex="auto" >
@@ -154,7 +95,6 @@ limitations under the License.
           <input ng-model="ctrl.file.name" ng-focus="ctrl.browseFile()" ng-readonly="true" name="fileName"/>
         </md-input-container>
       </div>
-     <!-- TODO: make cutom values file work...
       <md-button type="button" class="md-raised kd-upload-button" ng-click="ctrl.browseFile()">
         <label class="kd-upload-label">
           <md-icon>
@@ -163,12 +103,12 @@ limitations under the License.
         </label>
       </md-button>
       <input type="file" class="kd-upload-file-picker" kd-file-reader ng-model="ctrl.file">
-      -->
     </div>
     <kd-user-help>
       {{::ctrl.i18n.MSG_DEPLOY_CHART_CUSTOM_VALUES_USER_HELP}}
     </kd-user-help>
   </kd-help-section>
+  -->
 
   <div></div>
   <md-button class="md-raised md-primary kd-deploy-submit-button" type="submit"
