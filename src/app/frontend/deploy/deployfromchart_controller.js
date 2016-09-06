@@ -71,7 +71,7 @@ export default class DeployFromChartController {
     this.selectedClass = "kd-chart-card-selected";
 
     /** @export */
-    this.selectedChart;
+    this.selectedChart = null;
 
     /**
      * List of available repository.
@@ -183,6 +183,7 @@ export default class DeployFromChartController {
     if (repoName == "None") {
       this.charts = [];
     }
+    this.selectedChart = null;
   }
 
   /**
