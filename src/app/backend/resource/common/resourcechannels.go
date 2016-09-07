@@ -44,6 +44,9 @@ type ResourceChannels struct {
 	// List and error channels to Replica Sets.
 	ReplicaSetList ReplicaSetListChannel
 
+	// List and error channels to Releases.
+	ReleaseList ReleaseListChannel
+
 	// List and error channels to Deployments.
 	DeploymentList DeploymentListChannel
 
@@ -357,6 +360,56 @@ func GetReplicationControllerListChannel(client client.ReplicationControllersNam
 type DeploymentListChannel struct {
 	List  chan *extensions.DeploymentList
 	Error chan error
+}
+
+type Release struct {
+	unversioned.TypeMeta `json:",inline"`
+	api.ObjectMeta       `json:"metadata,omitempty"`
+
+	Name string `json:"name"`
+}
+
+type ReleaseList struct {
+	unversioned.TypeMeta `json:",inline"`
+	unversioned.ListMeta `json:"metadata,omitempty"`
+
+	// Items is the list of deployments.
+	Items []Release `json:"items"` // TODO: Releases
+}
+
+// ReleaseListChannel is a list and error channels to Releases.
+type ReleaseListChannel struct {
+	List  chan *ReleaseList
+	Error chan error
+}
+
+// GetReleaseListChannel returns a pair of channels to a Release list and errors
+// that both must be read numReads times.
+func GetReleaseListChannel(client client.ReleasesNamespacer,
+	nsQuery *NamespaceQuery, numReads int) ReleaseListChannel {
+
+	channel := ReleaseListChannel{
+		List:  make(chan *extensions.ReleaseList, numReads),
+		Error: make(chan error, numReads),
+	}
+
+	go func() {
+		// TODO: Releases
+		list, err := client.Deployments(nsQuery.ToRequestParam()).List(listEverything)
+		var filteredItems []extensions.Deployment
+		for _, item := range list.Items {
+			if nsQuery.Matches(item.ObjectMeta.Namespace) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		list.Items = filteredItems
+		for i := 0; i < numReads; i++ {
+			channel.List <- list
+			channel.Error <- err
+		}
+	}()
+
+	return channel
 }
 
 // GetDeploymentListChannel returns a pair of channels to a Deployment list and errors
