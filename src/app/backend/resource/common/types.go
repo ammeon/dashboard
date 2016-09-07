@@ -97,6 +97,7 @@ type ResourceKind string
 const (
 	ResourceKindReplicaSet            = "replicaset"
 	ResourceKindService               = "service"
+	ResourceKindRelease               = "release"
 	ResourceKindDeployment            = "deployment"
 	ResourceKindPod                   = "pod"
 	ResourceKindEvent                 = "event"
@@ -139,6 +140,7 @@ var kindToAPIMapping = map[string]struct {
 	ResourceKindPod:                   {"pods", ClientTypeDefault},
 	ResourceKindEvent:                 {"events", ClientTypeDefault},
 	ResourceKindReplicationController: {"replicationcontrollers", ClientTypeDefault},
+	ResourceKindRelease:               {"release", ClientTypeExtensionClient},
 	ResourceKindDeployment:            {"deployments", ClientTypeExtensionClient},
 	ResourceKindReplicaSet:            {"replicasets", ClientTypeExtensionClient},
 	ResourceKindDaemonSet:             {"daemonsets", ClientTypeExtensionClient},

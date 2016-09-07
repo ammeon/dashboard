@@ -39,6 +39,7 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/persistentvolumeclaim"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/petset"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/pod"
+	"github.com/kubernetes/dashboard/src/app/backend/resource/release"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicaset"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicationcontroller"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/secret"
@@ -227,6 +228,19 @@ func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.Heapst
 		apiV1Ws.GET("/pod/{namespace}/{pod}/log/{container}").
 			To(apiHandler.handleLogs).
 			Writes(container.Logs{}))
+
+	apiV1Ws.Route(
+		apiV1Ws.GET("/release").
+			To(apiHandler.handleGetReleases).
+			Writes(release.ReleaseList{}))
+	apiV1Ws.Route(
+		apiV1Ws.GET("/release/{namespace}").
+			To(apiHandler.handleGetReleases).
+			Writes(release.ReleaseList{}))
+	apiV1Ws.Route(
+		apiV1Ws.GET("/release/{namespace}/{release}").
+			To(apiHandler.handleGetReleaseDetail).
+			Writes(release.ReleaseDetail{}))
 
 	apiV1Ws.Route(
 		apiV1Ws.GET("/deployment").
@@ -749,6 +763,21 @@ func (apiHandler *APIHandler) handleGetDeployments(
 	}
 
 	response.WriteHeaderAndEntity(http.StatusCreated, result)
+}
+
+// Handles get Release detail API call.
+func (apiHandler *APIHandler) handleGetReleaseDetail(
+	request *restful.Request, response *restful.Response) {
+
+	namespace := request.PathParameter("namespace")
+	name := request.PathParameter("release")
+	result, err := release.GetReleaseDetail(apiHandler.client, namespace, name)
+	if err != nil {
+		handleInternalError(response, err)
+		return
+	}
+
+	response.WriteHeaderAndEntity(http.StatusOK, result)
 }
 
 // Handles get Deployment detail API call.
