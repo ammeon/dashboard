@@ -139,6 +139,11 @@ func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.Heapst
 			To(apiHandler.handleDeployFromFile).
 			Reads(replicationcontroller.AppDeploymentFromFileSpec{}).
 			Writes(replicationcontroller.AppDeploymentFromFileResponse{}))
+	apiV1Ws.Route(
+		apiV1Ws.POST("/appdeploymentfromchart").
+			To(apiHandler.handleDeployFromChart).
+			Reads(replicationcontroller.AppDeploymentFromChartSpec{}).
+			Writes(replicationcontroller.AppDeploymentFromChartResponse{}))
 
 	apiV1Ws.Route(
 		apiV1Ws.GET("/replicationcontroller").
@@ -519,6 +524,21 @@ func (apiHandler *APIHandler) handleDeploy(request *restful.Request, response *r
 	}
 
 	response.WriteHeaderAndEntity(http.StatusCreated, appDeploymentSpec)
+}
+
+// Handles deploy from chart API call.
+func (apiHandler *APIHandler) handleDeployFromChart(request *restful.Request, response *restful.Response) {
+	deploymentSpec := new(replicationcontroller.AppDeploymentFromChartSpec)
+	if err := request.ReadEntity(deploymentSpec); err != nil {
+		handleInternalError(response, err)
+		return
+	}
+	if err := replicationcontroller.DeployChart(deploymentSpec, apiHandler.client); err != nil {
+		handleInternalError(response, err)
+		return
+	}
+
+	response.WriteHeaderAndEntity(http.StatusCreated, deploymentSpec)
 }
 
 // Handles deploy from file API call.
