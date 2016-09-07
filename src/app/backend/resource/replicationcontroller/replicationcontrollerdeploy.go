@@ -143,6 +143,33 @@ type Protocols struct {
 	Protocols []api.Protocol `json:"protocols"`
 }
 
+// AppDeploymentFromChartSpec is a specification for a chart deployment.
+type AppDeploymentFromChartSpec struct {
+	// Name of the chart.
+	ChartName string `json:"chartName"`
+
+	// Name of the release.
+	ReleaseName string `json:"releaseName"`
+}
+
+// AppDeploymentFromChartResponse is a specification for a chart deployment.
+type AppDeploymentFromChartResponse struct {
+	// Name of the chart.
+	ChartName string `json:"chartName"`
+
+	// Name of the release.
+	ReleaseName string `json:"releaseName"`
+
+	// Error after deploying chart
+	Error string `json:"error"`
+}
+
+// DeployChart deploys an chart based on the given configuration.
+func DeployChart(spec *AppDeploymentFromChartSpec, client client.Interface) error {
+	log.Printf("Deploying chart %s with release name %s", spec.ChartName, spec.ReleaseName)
+	return nil
+}
+
 // DeployApp deploys an app based on the given configuration. The app is deployed using the given
 // client. App deployment consists of a replication controller and an optional service. Both of them
 // share common labels.

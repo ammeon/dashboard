@@ -74,6 +74,11 @@ export default class DeployFromChartController {
     this.selectedChart = null;
 
     /**
+     * @export {string}
+     */
+    this.name = '';
+
+    /**
      * List of available repository.
      * @export {!Array<string>}
      */
@@ -94,16 +99,15 @@ export default class DeployFromChartController {
    */
   deploy() {
     if (this.form.$valid) {
-      /** @type {!backendApi.AppDeploymentFromFileSpec} */
+      /** @type {!backendApi.AppDeploymentFromChartSpec} */
       let deploymentSpec = {
-        name: this.file.name,
-        content: this.file.content,
+        chartName: this.selectedChart,
+        releaseName: this.name,
       };
-
       let defer = this.q_.defer();
 
-      /** @type {!angular.Resource<!backendApi.AppDeploymentFromFileSpec>} */
-      let resource = this.resource_('api/v1/appdeploymentfromfile');
+      /** @type {!angular.Resource<!backendApi.AppDeploymentFromChartSpec>} */
+      let resource = this.resource_('api/v1/appdeploymentfromchart');
       this.isDeployInProgress_ = true;
       resource.save(
           deploymentSpec,
@@ -111,14 +115,16 @@ export default class DeployFromChartController {
             defer.resolve(response);  // Progress ends
             this.log_.info('Deployment is completed: ', response);
             if (response.error.length > 0) {
-              this.errorDialog_.open('Deployment has been partly completed', response.error);
+              this.errorDialog_.open('Chart deployment has partly completed', response.error);
             }
-            this.kdHistoryService_.back(workloads);
+            //this.kdHistoryService_.back(workloads);
+            this.log_.info('Successfully deployed chart');
+            this.state_.go(workloads);
           },
           (err) => {
             defer.reject(err);  // Progress ends
-            this.log_.error('Error deploying application:', err);
-            this.errorDialog_.open('Deploying file has failed', err.data);
+            this.log_.error('Error deploying chart:', err);
+            this.errorDialog_.open('Deploying chart has failed', err.data);
           });
       defer.promise.finally(() => { this.isDeployInProgress_ = false; });
     }
