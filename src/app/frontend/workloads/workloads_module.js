@@ -14,6 +14,7 @@
 
 import componentsModule from 'common/components/components_module';
 import chromeModule from 'chrome/chrome_module';
+import releaseListModule from 'releaselist/releaselist_module';
 import deploymentListModule from 'deploymentlist/deploymentlist_module';
 import daemonSetListModule from 'daemonsetlist/daemonsetlist_module';
 import jobListModule from 'joblist/joblist_module';
@@ -40,6 +41,7 @@ export default angular
           jobListModule.name,
           replicationControllerListModule.name,
           replicaSetListModule.name,
+          releaseListModule.name,
           deploymentListModule.name,
           daemonSetListModule.name,
           petSetListModule.name,

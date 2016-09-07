@@ -19,6 +19,7 @@
 import chromeModule from './chrome/chrome_module';
 import deployModule from './deploy/deploy_module';
 import deploymentListModule from './deploymentlist/deploymentlist_module';
+import releaseListModule from './releaselist/releaselist_module';
 import errorModule from './error/error_module';
 import indexConfig from './index_config';
 import jobListModule from './joblist/joblist_module';
@@ -65,6 +66,7 @@ export default angular
           namespaceListModule.name,
           nodeListModule.name,
           deploymentListModule.name,
+          releaseListModule.name,
           workloadsModule.name,
           serviceDetailModule.name,
           serviceListModule.name,
