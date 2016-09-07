@@ -15,7 +15,7 @@ sudo docker run \
 	--rm \
 	--net=host \
 	-v /var/run/docker.sock:/var/run/docker.sock \
-	-v ${DIR}/src/app/frontend/:/dashboard/src/app/frontend/ \
+	-v ${DIR}/src/app/:/dashboard/src/app/ \
 	${DOCKER_RUN_OPTS} \
 	${DASHBOARD_IMAGE_NAME} \
 	${DEFAULT_COMMAND} serve
