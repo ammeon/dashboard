@@ -62,7 +62,7 @@ const i18n = {
 
   /** @export {string} @desc Text for a selection option, which the user must click to select a
      chart to deploy from on the deploy page. */
-  MSG_DEPLOY_CHART_ACTION: goog.getMsg('Deploy a Helm chart'),
+  MSG_DEPLOY_HELM_CHART_ACTION: goog.getMsg('Deploy a Helm chart'),
 
   /** @export {string} @desc User help with a link redirecting to the "Dashboard tour" on the
      deploy page. */

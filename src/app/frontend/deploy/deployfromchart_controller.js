@@ -71,12 +71,12 @@ export default class DeployFromChartController {
     this.selectedClass = "kd-chart-card-selected";
 
     /** @export */
-    this.selectedChart = null;
+    this.selectedChart = "";
 
     /**
      * @export {string}
      */
-    this.name = '';
+    this.name = "";
 
     /**
      * List of available repository.
@@ -113,13 +113,11 @@ export default class DeployFromChartController {
           deploymentSpec,
           (response) => {
             defer.resolve(response);  // Progress ends
-            this.log_.info('Deployment is completed: ', response);
-            if (response.error.length > 0) {
+            this.log_.info('Chart deployment completed: ', response);
+            if (response.error > 0) {
               this.errorDialog_.open('Chart deployment has partly completed', response.error);
             }
-            //this.kdHistoryService_.back(workloads);
-            this.log_.info('Successfully deployed chart');
-            this.state_.go(workloads);
+            this.kdHistoryService_.back(workloads);
           },
           (err) => {
             defer.reject(err);  // Progress ends
