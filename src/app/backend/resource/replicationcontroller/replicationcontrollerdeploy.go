@@ -26,6 +26,8 @@ import (
 	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	kubectlResource "k8s.io/kubernetes/pkg/kubectl/resource"
 	"k8s.io/kubernetes/pkg/util/intstr"
+
+	dashboardclient "github.com/kubernetes/dashboard/src/app/backend/client"
 )
 
 const (
@@ -150,6 +152,9 @@ type AppDeploymentFromChartSpec struct {
 
 	// Name of the release.
 	ReleaseName string `json:"releaseName"`
+
+	// Namespace for release.
+	Namespace string `json:"namespace"`
 }
 
 // AppDeploymentFromChartResponse is a specification for a chart deployment.
@@ -160,6 +165,12 @@ type AppDeploymentFromChartResponse struct {
 	// Name of the release.
 	ReleaseName string `json:"releaseName"`
 
+	// Name of the release.
+	ReleaseName string `json:"releaseName"`
+
+	// Namespace for release.
+	Namespace string `json:"namespace"`
+
 	// Error after deploying chart
 	Error string `json:"error"`
 }
@@ -167,8 +178,55 @@ type AppDeploymentFromChartResponse struct {
 // DeployChart deploys an chart based on the given configuration.
 func DeployChart(spec *AppDeploymentFromChartSpec, client client.Interface) error {
 	log.Printf("Deploying chart %s with release name %s", spec.ChartName, spec.ReleaseName)
+
+	// TODO: pre-init tiller client and provide as param to this func
+	if tc, err := dashboardclient.CreateTillerClient(); err != nil {
+		log.Printf("Error creating tiller client: %s", err)
+		return err
+	}
+
+	// if res, err := tc.ListReleases(); err != nil {
+	// 	log.Printf("Error listing releases: %s", err)
+	// 	return err
+	// }
+	// log.Printf("helm releases: %s", res.Releases)
+
+	chartPath, err := fechChart(spec.ChartName, false, "")
+	if err != nil {
+		log.Printf("Failed to find chart: %s", err)
+		return err
+	}
+
+	res, err := tc.InstallRelease(
+		chartPath,
+		spec.Namespace,
+		spec.ReleaseName,
+		)
+	if err != nil {
+		log.Printf("Error installing release: %s", err)
+		return err
+	}
+	log.Printf("Release response: %s", res)
 	return nil
 }
+
+// fetchChart downlods the chart and returns either the full path or an error.
+func fechChart(name string, verify bool, keyring string) (string, error) {
+	// Try fetching the chart from a remote repo into a tmpdir
+	origname := name
+	if filepath.Ext(name) != ".tgz" {
+		name += ".tgz"
+	}
+	if err := downloadChart(name, false, ".", verify, keyring); err == nil {
+		lname, err := filepath.Abs(filepath.Base(name))
+		if err != nil {
+			return lname, err
+		}
+		fmt.Printf("Fetched %s to %s\n", origname, lname)
+		return lname, nil
+	}
+
+	return name, fmt.Errorf("file %q not found", origname)
 
 // DeployApp deploys an app based on the given configuration. The app is deployed using the given
 // client. App deployment consists of a replication controller and an optional service. Both of them
