@@ -3,7 +3,7 @@
 # docker container image tags
 docker_group := ammeon
 docker_image := kubernetes-helm-dashboard-amd64
-docker_ver   := 0.0.1
+docker_ver   := 0.0.2
 docker_tag   := $(docker_group)/$(docker_image):$(docker_ver)
 canary_tag   := gcr.io/google_containers/kubernetes-dashboard-amd64:canary
 
@@ -33,6 +33,10 @@ build: build-image tag-image push-image
 build-builder:
 	$(dk) build -t $(build_image) -f $(dir)/build/Dockerfile $(dir)
 
+# Run 'bash' in dashboard builder image
+bash:
+	$(dk_run) bash
+
 # Build dashboard image
 build-image:
 	$(dk_run) $(gulp_cmd) docker-image:canary
@@ -47,6 +51,6 @@ push-image:
 
 # Serve dashboard locally
 serve:
-	ps aux | grep "kubectl proxy" | grep -v "grep" | cut -d " " -f2 | xargs -r kill -9
+	ps aux | grep "kubectl proxy" | grep -v "grep" | cut -d " " -f3 | xargs -r kill -9
 	kubectl proxy --port=8080 &
 	$(dk_run) $(gulp_cmd) serve
