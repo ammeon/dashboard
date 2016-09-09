@@ -162,9 +162,6 @@ type AppDeploymentFromChartResponse struct {
 	// Name of the release.
 	ReleaseName string `json:"releaseName"`
 
-	// Name of the release.
-	ReleaseName string `json:"releaseName"`
-
 	// Namespace for release.
 	Namespace string `json:"namespace"`
 
@@ -172,12 +169,14 @@ type AppDeploymentFromChartResponse struct {
 	Error string `json:"error"`
 }
 
+// TODO: relocate to chart resource pakcage
 // DeployChart deploys an chart based on the given configuration.
 func DeployChart(spec *AppDeploymentFromChartSpec, client client.Interface) error {
 	log.Printf("Deploying chart %s with release name %s", spec.ChartName, spec.ReleaseName)
 
 	// TODO: pre-init tiller client and provide as param to this func
-	if tc, err := dashboardclient.CreateTillerClient(); err != nil {
+	tc, err := dashboardclient.CreateTillerClient()
+	if err != nil {
 		log.Printf("Error creating tiller client: %s", err)
 		return err
 	}
@@ -188,6 +187,7 @@ func DeployChart(spec *AppDeploymentFromChartSpec, client client.Interface) erro
 	// }
 	// log.Printf("helm releases: %s", res.Releases)
 
+	// TODO: refactor to use similar logic as in helm cmd
 	chartPath, err := fechChart(spec.ChartName, false, "")
 	if err != nil {
 		log.Printf("Failed to find chart: %s", err)
@@ -198,7 +198,7 @@ func DeployChart(spec *AppDeploymentFromChartSpec, client client.Interface) erro
 		chartPath,
 		spec.Namespace,
 		spec.ReleaseName,
-		)
+	)
 	if err != nil {
 		log.Printf("Error installing release: %s", err)
 		return err
@@ -224,6 +224,7 @@ func fechChart(name string, verify bool, keyring string) (string, error) {
 	}
 
 	return name, fmt.Errorf("file %q not found", origname)
+}
 
 // DeployApp deploys an app based on the given configuration. The app is deployed using the given
 // client. App deployment consists of a replication controller and an optional service. Both of them

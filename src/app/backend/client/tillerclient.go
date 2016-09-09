@@ -28,12 +28,12 @@ import (
 
 const (
 	tillerNamespace = "kube-system"
-	tillerPort = 44134
+	tillerPort      = 44134
 )
 
-
 func CreateTillerClient() (*helm.Client, error) {
-	if tunnel, err := newTillerPortForwarder(tillerNamespace); err != nil {
+	tunnel, err := newTillerPortForwarder(tillerNamespace)
+	if err != nil {
 		return nil, err
 	}
 	log.Printf("Created tunnel using local port: '%d'", tunnel.Local)
@@ -48,14 +48,15 @@ var tunnel *kube.Tunnel
 
 func newTillerPortForwarder(namespace string) (*kube.Tunnel, error) {
 	kc := kube.New(nil)
-	if client, err := kc.APIClient(); err != nil {
+	client, err := kc.APIClient()
+	if err != nil {
 		return nil, err
 	}
-
-	if podName, err := getTillerPodName(client, namespace); err != nil {
+	podName, err := getTillerPodName(client, namespace)
+	if err != nil {
 		return nil, err
 	}
-	log.Printf("tiller pod found: %q", podName)}
+	log.Printf("tiller pod found: %q", podName)
 	return kc.ForwardPort(namespace, podName, tillerPort)
 }
 
