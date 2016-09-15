@@ -24,6 +24,7 @@ import (
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/kubernetes/dashboard/src/app/backend/client"
+	"github.com/kubernetes/dashboard/src/app/backend/resource/chart"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/configmap"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/container"
@@ -142,8 +143,8 @@ func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.Heapst
 	apiV1Ws.Route(
 		apiV1Ws.POST("/appdeploymentfromchart").
 			To(apiHandler.handleDeployFromChart).
-			Reads(replicationcontroller.AppDeploymentFromChartSpec{}).
-			Writes(replicationcontroller.AppDeploymentFromChartResponse{}))
+			Reads(chart.AppDeploymentFromChartSpec{}).
+			Writes(chart.AppDeploymentFromChartResponse{}))
 
 	apiV1Ws.Route(
 		apiV1Ws.GET("/replicationcontroller").
@@ -528,12 +529,12 @@ func (apiHandler *APIHandler) handleDeploy(request *restful.Request, response *r
 
 // Handles deploy from chart API call.
 func (apiHandler *APIHandler) handleDeployFromChart(request *restful.Request, response *restful.Response) {
-	deploymentSpec := new(replicationcontroller.AppDeploymentFromChartSpec)
+	deploymentSpec := new(chart.AppDeploymentFromChartSpec)
 	if err := request.ReadEntity(deploymentSpec); err != nil {
 		handleInternalError(response, err)
 		return
 	}
-	if err := replicationcontroller.DeployChart(deploymentSpec, apiHandler.client); err != nil {
+	if err := chart.DeployChart(deploymentSpec, apiHandler.client); err != nil {
 		handleInternalError(response, err)
 		return
 	}
