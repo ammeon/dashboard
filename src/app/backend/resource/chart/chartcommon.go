@@ -24,7 +24,7 @@ var (
 )
 
 func homePath() string {
-	return ""
+	return "/.helm"
 }
 
 func repositoryDirectory() string {
@@ -47,6 +47,64 @@ func localRepoDirectory(paths ...string) string {
 
 func repositoriesFile() string {
 	return filepath.Join(repositoryDirectory(), repositoriesFilePath)
+}
+
+var (
+	defaultRepository    = "kubernetes-charts"
+	defaultRepositoryURL = "http://storage.googleapis.com/kubernetes-charts"
+)
+
+// ensureHome checks to see if $HELM_HOME exists
+//
+// If $HELM_HOME does not exist, this function will create it.
+func ensureHome() error {
+	configDirectories := []string{homePath(), repositoryDirectory(), cacheDirectory(), localRepoDirectory()}
+
+	for _, p := range configDirectories {
+		if fi, err := os.Stat(p); err != nil {
+			fmt.Printf("Creating %s \n", p)
+			if err := os.MkdirAll(p, 0755); err != nil {
+				return fmt.Errorf("Could not create %s: %s", p, err)
+			}
+		} else if !fi.IsDir() {
+			return fmt.Errorf("%s must be a directory", p)
+		}
+	}
+
+	repoFile := repositoriesFile()
+	if fi, err := os.Stat(repoFile); err != nil {
+		fmt.Printf("Creating %s \n", repoFile)
+		if _, err := os.Create(repoFile); err != nil {
+			return err
+		}
+		if err := addRepo(defaultRepository, defaultRepositoryURL); err != nil {
+			return err
+		}
+		// Add custom repos
+		if err := addRepo("aia-repo", "http://172.19.29.166:8879/charts"); err != nil {
+			return err
+		}
+
+	} else if fi.IsDir() {
+		return fmt.Errorf("%s must be a file, not a directory", repoFile)
+	}
+
+	localRepoIndexFile := localRepoDirectory(localRepoIndexFilePath)
+	if fi, err := os.Stat(localRepoIndexFile); err != nil {
+		fmt.Printf("Creating %s \n", localRepoIndexFile)
+		_, err := os.Create(localRepoIndexFile)
+		if err != nil {
+			return err
+		}
+
+		//TODO: take this out and replace with helm update functionality
+		os.Symlink(localRepoIndexFile, cacheDirectory("local-index.yaml"))
+	} else if fi.IsDir() {
+		return fmt.Errorf("%s must be a file, not a directory", localRepoIndexFile)
+	}
+
+	fmt.Printf("$HELM_HOME has been configured at %s.\n", homePath())
+	return nil
 }
 
 // locateChartPath looks for a chart directory in known places, and returns either the full path or an error.
@@ -72,7 +130,8 @@ func locateChartPath(name string) (string, error) {
 	if filepath.Ext(name) != ".tgz" {
 		name += ".tgz"
 	}
-	if err := downloadChart(name, false, "."); err == nil {
+	err := downloadChart(name, false, ".")
+	if err == nil {
 		lname, err := filepath.Abs(filepath.Base(name))
 		if err != nil {
 			return lname, err
@@ -81,7 +140,7 @@ func locateChartPath(name string) (string, error) {
 		return lname, nil
 	}
 
-	return name, fmt.Errorf("file %q not found", origname)
+	return name, fmt.Errorf("file %q not found: %s", origname, err)
 }
 
 // downloadChart fetches a chart over HTTP
@@ -92,6 +151,8 @@ func downloadChart(pname string, untar bool, untardir string) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Repos are : %s", r.Repositories)
+	log.Printf("Pname is : %s", pname)
 
 	// get download url
 	u, err := mapRepoArg(pname, r.Repositories)
@@ -101,6 +162,7 @@ func downloadChart(pname string, untar bool, untardir string) error {
 
 	href := u.String()
 	buf, err := fetchChart(href)
+	log.Printf("Fetching chart from: %s", href)
 	if err != nil {
 		return err
 	}

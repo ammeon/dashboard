@@ -141,6 +141,30 @@ export default class DeployFromChartController {
    */
   cancel() { this.kdHistoryService_.back(workloads); }
 
+  /**
+   * Queries all avialable repos.
+   * @export
+   */
+  getRepos() {
+    /** @type {!angular.Resource<!backendApi.RepoList>} */
+    let resource = this.resource_(`api/v1/repository`);
+    resource.get(
+        (res) => { this.repos = res.repos.map((e) => e.objectMeta.name); },
+        (err) => { this.log_.log(`Error getting secrets: ${err}`); });
+  }
+
+  /**
+   * Queries all charts for a given repo.
+   * @param {string} repo
+   * @export
+   */
+  getCharts(repo) {
+    /** @type {!angular.Resource<!backendApi.ChartList>} */
+    let resource = this.resource_(`api/v1/repository/${repo}`);
+    resource.get(
+        (res) => { this.charts = res.charts.map((e) => e.objectMeta.name); },
+        (err) => { this.log_.log(`Error getting secrets: ${err}`); });
+  }
 
   /**
    * Selects a chart repository.
@@ -151,25 +175,32 @@ export default class DeployFromChartController {
     if (repoName == "ammeon-charts") {
       this.charts = [{"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
                   "name": "Example App 1",
+                  "version": "Example App 1",
+                  "fullName": "aia-repo/aia-timezone-converter1-1.0.1.tgz",
                   "description": "Example App with sample app",
                   "selected": "",
                  },
-                 {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
+                 {"icon": "https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png",
                   "name": "PostgresSQL",
+                  "fullName": "aia-repo/aia-timezone-converter2-1.0.1.tgz",
                   "description": "An postgresql sample database app",
                  },
                  {"icon": "http://design.jboss.org/wildfly/logo/final/wildfly_logo_stacked_600px.png",
                   "name": "Wildfly App 1",
+                  // "fullName": repoName + "/" + "aia-timezone-converter" + "-" + "1.0.1" + ".tgz",
+                  "fullName": "aia-repo" + "/" + "aia-timezone-converter" + "-" + "1.0.1" + ".tgz",
                   "description": "Example App with Activemq",
                   "selected": "",
                  },
                  {"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
                   "name": "Wildfly App 2",
+                  "fullName": "aia-repo/aia-timezone-converter3-1.0.1.tgz",
                   "description": "Example App with Activemq",
                   "selected": "",
                  },
                  {"icon": "https://deis.com/assets/images/svg/helm-logo.svg",
                   "name": "Wildfly App 3",
+                  "fullName": "aia-repo/aia-timezone-converter4-1.0.1.tgz",
                   "description": "Example App with Activemq",
                   "selected": "",
                  },
@@ -177,8 +208,9 @@ export default class DeployFromChartController {
     }
     if (repoName == "kubernetes-charts") {
       this.charts = [
-               {"icon": "https://lh3.googleusercontent.com/LbedQe3EHVrogFarNml-75q3xkHqx2MbkD-Tugu-BUOJWLR5iTwfyS7PtfzOt9IOOsMJ0j621RBR",
+               {"icon": "https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png",
                 "name": "PostgresSQL",
+                "fullName": "aia-repo/aia-timezone-converter4-1.0.1.tgz",
                 "description": "An postgresql sample database app",
                 "selected": "",
                },
@@ -197,7 +229,7 @@ export default class DeployFromChartController {
   selectChart(chartName) {
     for (var i = 0; i < this.charts.length; i++) { 
       this.charts[i]["selected"] = "";
-      if (this.charts[i]["name"] == chartName) {
+      if (this.charts[i]["fullName"] == chartName) {
         this.charts[i]["selected"] = this.selectedClass;  
       }
     }
