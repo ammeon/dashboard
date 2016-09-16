@@ -31,7 +31,7 @@ const (
 	tillerPort      = 44134
 )
 
-func CreateTillerClient() (*helm.Client, error) {
+func CreateHelmTillerClient() (*helm.Client, error) {
 	tunnel, err := newTillerPortForwarder(tillerNamespace)
 	if err != nil {
 		return nil, err

@@ -45,6 +45,7 @@ import (
 	resourceService "github.com/kubernetes/dashboard/src/app/backend/resource/service"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/workload"
 	"github.com/kubernetes/dashboard/src/app/backend/validation"
+	"k8s.io/helm/pkg/helm"
 	clientK8s "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 	"k8s.io/kubernetes/pkg/runtime"
@@ -65,6 +66,7 @@ type APIHandler struct {
 	heapsterClient client.HeapsterClient
 	clientConfig   clientcmd.ClientConfig
 	verber         common.ResourceVerber
+	helmClient     *helm.Client
 }
 
 // Web-service filter function used for request and response logging.
@@ -95,11 +97,11 @@ func FormatResponseLog(resp *restful.Response, req *restful.Request) string {
 
 // CreateHTTPAPIHandler creates a new HTTP handler that handles all requests to the API of the backend.
 func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.HeapsterClient,
-	clientConfig clientcmd.ClientConfig) http.Handler {
+	clientConfig clientcmd.ClientConfig, helmClient *helm.Client) http.Handler {
 
 	verber := common.NewResourceVerber(client.RESTClient, client.ExtensionsClient.RESTClient,
 		client.AppsClient.RESTClient, client.BatchClient.RESTClient)
-	apiHandler := APIHandler{client, heapsterClient, clientConfig, verber}
+	apiHandler := APIHandler{client, heapsterClient, clientConfig, verber, helmClient}
 	wsContainer := restful.NewContainer()
 	wsContainer.EnableContentEncoding(true)
 
@@ -293,6 +295,20 @@ func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.Heapst
 		apiV1Ws.GET("/namespace/{name}").
 			To(apiHandler.handleGetNamespaceDetail).
 			Writes(namespace.NamespaceDetail{}))
+
+	apiV1Ws.Route(
+		apiV1Ws.POST("/repository").
+			To(apiHandler.handleAddRepository).
+			Reads(chart.RepositorySpec{}).
+			Writes(chart.RepositorySpec{}))
+	apiV1Ws.Route(
+		apiV1Ws.GET("/repository").
+			To(apiHandler.handleGetRepository).
+			Writes(chart.RepositoryListSpec{}))
+	apiV1Ws.Route(
+		apiV1Ws.GET("/repository/{name}").
+			To(apiHandler.handleGetRepositoryCharts).
+			Writes(chart.RepositoryChartListSpec{}))
 
 	apiV1Ws.Route(
 		apiV1Ws.GET("/secret").
@@ -534,7 +550,7 @@ func (apiHandler *APIHandler) handleDeployFromChart(request *restful.Request, re
 		handleInternalError(response, err)
 		return
 	}
-	if err := chart.DeployChart(deploymentSpec, apiHandler.client); err != nil {
+	if err := chart.DeployChart(deploymentSpec, apiHandler.helmClient); err != nil {
 		handleInternalError(response, err)
 		return
 	}
@@ -920,6 +936,47 @@ func (apiHandler *APIHandler) handleGetNamespaceDetail(request *restful.Request,
 	response *restful.Response) {
 	name := request.PathParameter("name")
 	result, err := namespace.GetNamespaceDetail(apiHandler.client, apiHandler.heapsterClient, name)
+	if err != nil {
+		handleInternalError(response, err)
+		return
+	}
+	response.WriteHeaderAndEntity(http.StatusCreated, result)
+}
+
+// Handles adding repository API call.
+func (apiHandler *APIHandler) handleAddRepository(request *restful.Request,
+	response *restful.Response) {
+	repositorySpec := new(chart.RepositorySpec)
+	if err := request.ReadEntity(repositorySpec); err != nil {
+		handleInternalError(response, err)
+		return
+	}
+	if err := chart.AddRepository(repositorySpec); err != nil {
+		handleInternalError(response, err)
+		return
+	}
+
+	response.WriteHeaderAndEntity(http.StatusCreated, repositorySpec)
+}
+
+// Handles get repository list API call.
+func (apiHandler *APIHandler) handleGetRepository(
+	request *restful.Request, response *restful.Response) {
+
+	result, err := chart.GetRepositoryList()
+	if err != nil {
+		handleInternalError(response, err)
+		return
+	}
+
+	response.WriteHeaderAndEntity(http.StatusCreated, result)
+}
+
+// Handles get charts for a repository API call.
+func (apiHandler *APIHandler) handleGetRepositoryCharts(request *restful.Request,
+	response *restful.Response) {
+	repoName := request.PathParameter("name")
+	result, err := chart.GetRepositoryCharts(repoName)
 	if err != nil {
 		handleInternalError(response, err)
 		return
