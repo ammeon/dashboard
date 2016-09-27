@@ -25,6 +25,7 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/job"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/petset"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/pod"
+	"github.com/kubernetes/dashboard/src/app/backend/resource/release"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicaset"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicationcontroller"
 	k8sClient "k8s.io/kubernetes/pkg/client/unversioned"
@@ -32,6 +33,8 @@ import (
 
 // Workloads structure contains all resource lists grouped into the workloads category.
 type Workloads struct {
+	ReleaseList release.ReleaseList `json:"releaseList"`
+
 	DeploymentList deployment.DeploymentList `json:"deploymentList"`
 
 	ReplicaSetList replicaset.ReplicaSetList `json:"replicaSetList"`
@@ -57,7 +60,7 @@ func GetWorkloads(client *k8sClient.Client, heapsterClient client.HeapsterClient
 		ReplicaSetList:            common.GetReplicaSetListChannel(client.Extensions(), nsQuery, 1),
 		JobList:                   common.GetJobListChannel(client.Batch(), nsQuery, 1),
 		DaemonSetList:             common.GetDaemonSetListChannel(client.Extensions(), nsQuery, 1),
-		ReleaseList:               common.GetReleaseListChannel(client.Extensions(), nsQuery, 1),
+		ReleaseList:               common.GetReleaseListChannel(nsQuery, 1),
 		DeploymentList:            common.GetDeploymentListChannel(client.Extensions(), nsQuery, 1),
 		PetSetList:                common.GetPetSetListChannel(client.Apps(), nsQuery, 1),
 		ServiceList:               common.GetServiceListChannel(client, nsQuery, 1),

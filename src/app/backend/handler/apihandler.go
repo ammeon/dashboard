@@ -994,13 +994,13 @@ func (apiHandler *APIHandler) handleGetDeployments(
 	response.WriteHeaderAndEntity(http.StatusCreated, result)
 }
 
-// Handles get Release detail API call.
-func (apiHandler *APIHandler) handleGetReleaseDetail(
+// Handles get Deployment detail API call.
+func (apiHandler *APIHandler) handleGetDeploymentDetail(
 	request *restful.Request, response *restful.Response) {
 
 	namespace := request.PathParameter("namespace")
-	name := request.PathParameter("release")
-	result, err := release.GetReleaseDetail(apiHandler.client, namespace, name)
+	name := request.PathParameter("deployment")
+	result, err := deployment.GetDeploymentDetail(apiHandler.client, apiHandler.heapsterClient, namespace, name)
 	if err != nil {
 		handleInternalError(response, err)
 		return
@@ -1009,14 +1009,29 @@ func (apiHandler *APIHandler) handleGetReleaseDetail(
 	response.WriteHeaderAndEntity(http.StatusOK, result)
 }
 
-// Handles get Deployment detail API call.
-func (apiHandler *APIHandler) handleGetDeploymentDetail(
+// Handles get Deployment list API call.
+func (apiHandler *APIHandler) handleGetReleases(
+	request *restful.Request, response *restful.Response) {
+
+	namespace := parseNamespacePathParameter(request)
+	dataSelect := parseDataSelectPathParameter(request)
+	dataSelect.MetricQuery = dataselect.StandardMetrics
+	result, err := release.GetReleaseList(apiHandler.client, namespace, dataSelect, &apiHandler.heapsterClient)
+	if err != nil {
+		handleInternalError(response, err)
+		return
+	}
+
+	response.WriteHeaderAndEntity(http.StatusCreated, result)
+}
+
+// Handles get Release detail API call.
+func (apiHandler *APIHandler) handleGetReleaseDetail(
 	request *restful.Request, response *restful.Response) {
 
 	namespace := request.PathParameter("namespace")
-	name := request.PathParameter("deployment")
-
-	result, err := deployment.GetDeploymentDetail(apiHandler.client, apiHandler.heapsterClient, namespace, name)
+	name := request.PathParameter("release")
+	result, err := release.GetReleaseDetail(apiHandler.client, namespace, name)
 	if err != nil {
 		handleInternalError(response, err)
 		return
