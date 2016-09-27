@@ -18,14 +18,11 @@ import (
 	"log"
 
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
-	"k8s.io/kubernetes/pkg/apis/extensions"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 // ReleaseDetail is a presentation layer view of Kubernetes Release resource.
 type ReleaseDetail struct {
-	ObjectMeta common.ObjectMeta `json:"objectMeta"`
-
 	Name   string `json:"name"`
 	Status string `json:"status"`
 }
@@ -35,14 +32,14 @@ func GetReleaseDetail(client client.Interface, namespace string,
 	name string) (*ReleaseDetail, error) {
 
 	log.Printf("Getting details of %s release in %s namespace", name, namespace)
+	release := &common.Release{}
 
 	return getReleaseDetail(release), nil
 }
 
-func getReleaseDetail(release *extensions.Release) {
+func getReleaseDetail(release *common.Release) *ReleaseDetail {
 	return &ReleaseDetail{
-		ObjectMeta: common.NewObjectMeta(release.ObjectMeta),
-		Name:       "happy-panda", // TODO: Releases
-		Name:       "DEPLOYED",    // TODO: Releases
+		Name:   "happy-panda", // TODO: Releases
+		Status: "DEPLOYED",    // TODO: Releases
 	}
 }

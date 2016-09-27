@@ -262,21 +262,6 @@ type DeploymentListChannel struct {
 	Error chan error
 }
 
-type Release struct {
-	unversioned.TypeMeta `json:",inline"`
-	api.ObjectMeta       `json:"metadata,omitempty"`
-
-	Name string `json:"name"`
-}
-
-type ReleaseList struct {
-	unversioned.TypeMeta `json:",inline"`
-	unversioned.ListMeta `json:"metadata,omitempty"`
-
-	// Items is the list of deployments.
-	Items []Release `json:"items"` // TODO: Releases
-}
-
 // ReleaseListChannel is a list and error channels to Releases.
 type ReleaseListChannel struct {
 	List  chan *ReleaseList
@@ -285,27 +270,21 @@ type ReleaseListChannel struct {
 
 // GetReleaseListChannel returns a pair of channels to a Release list and errors
 // that both must be read numReads times.
-func GetReleaseListChannel(client client.ReleasesNamespacer,
-	nsQuery *NamespaceQuery, numReads int) ReleaseListChannel {
+func GetReleaseListChannel(nsQuery *NamespaceQuery, numReads int) ReleaseListChannel {
+	// TODO: Pass the helm client as a param
 
 	channel := ReleaseListChannel{
-		List:  make(chan *extensions.ReleaseList, numReads),
+		List:  make(chan *ReleaseList, numReads),
 		Error: make(chan error, numReads),
 	}
 
 	go func() {
-		// TODO: Releases
-		list, err := client.Deployments(nsQuery.ToRequestParam()).List(listEverything)
-		var filteredItems []extensions.Deployment
-		for _, item := range list.Items {
-			if nsQuery.Matches(item.ObjectMeta.Namespace) {
-				filteredItems = append(filteredItems, item)
-			}
-		}
-		list.Items = filteredItems
+		// TODO: Get list of releases from helm, pass 'em through channel
+		list := &ReleaseList{}
+		list.Items = []Release{}
 		for i := 0; i < numReads; i++ {
 			channel.List <- list
-			channel.Error <- err
+			channel.Error <- nil
 		}
 	}()
 

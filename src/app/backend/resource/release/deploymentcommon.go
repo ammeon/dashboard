@@ -18,21 +18,20 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/dataselect"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/metric"
-	"k8s.io/kubernetes/pkg/apis/extensions"
 )
 
 // The code below allows to perform complex data section on []extensions.Release
 
-type ReleaseCell extensions.Release
+type ReleaseCell common.Release
 
 func (self ReleaseCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
 	case dataselect.NameProperty:
-		return dataselect.StdComparableString(self.ObjectMeta.Name)
+		return dataselect.StdComparableString(self.Name)
 	case dataselect.CreationTimestampProperty:
-		return dataselect.StdComparableTime(self.ObjectMeta.CreationTimestamp.Time)
+		return dataselect.StdComparableTime(self.Time)
 	case dataselect.NamespaceProperty:
-		return dataselect.StdComparableString(self.ObjectMeta.Namespace)
+		return dataselect.StdComparableString(self.Namespace)
 	default:
 		// if name is not supported then just return a constant dummy value, sort will have no effect.
 		return nil
@@ -41,14 +40,14 @@ func (self ReleaseCell) GetProperty(name dataselect.PropertyName) dataselect.Com
 
 func (self ReleaseCell) GetResourceSelector() *metric.ResourceSelector {
 	return &metric.ResourceSelector{
-		Namespace:    self.ObjectMeta.Namespace,
+		Namespace:    self.Namespace,
 		ResourceType: common.ResourceKindRelease,
-		ResourceName: self.ObjectMeta.Name,
-		Selector:     self.Spec.Selector.MatchLabels,
+		ResourceName: self.Name,
+		Selector:     nil, // TODO: Release
 	}
 }
 
-func toCells(std []extensions.Release) []dataselect.DataCell {
+func toCells(std []common.Release) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
 		cells[i] = ReleaseCell(std[i])
@@ -56,10 +55,10 @@ func toCells(std []extensions.Release) []dataselect.DataCell {
 	return cells
 }
 
-func fromCells(cells []dataselect.DataCell) []extensions.Release {
-	std := make([]extensions.Release, len(cells))
+func fromCells(cells []dataselect.DataCell) []common.Release {
+	std := make([]common.Release, len(cells))
 	for i := range std {
-		std[i] = extensions.Release(cells[i].(ReleaseCell))
+		std[i] = common.Release(cells[i].(ReleaseCell))
 	}
 	return std
 }
