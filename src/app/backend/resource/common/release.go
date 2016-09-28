@@ -22,6 +22,7 @@ type Release struct {
 	Name      string    `json:"name"`
 	Time      time.Time `json:"time"`
 	Namespace string    `json:"namespace"`
+	Status    string    `json:"status"`
 }
 
 type ReleaseList struct {

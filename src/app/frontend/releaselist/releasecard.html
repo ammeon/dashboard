@@ -36,35 +36,21 @@ limitations under the License.
     <kd-resource-card-column>
       <div>
         <a ng-href="{{::$ctrl.getReleaseDetailHref()}}" style="display: block;">
-          <kd-middle-ellipsis display-string="{{$ctrl.release.objectMeta.name}}">
+          <kd-middle-ellipsis display-string="{{$ctrl.release.name}}">
           </kd-middle-ellipsis>
         </a>
       </div>
     </kd-resource-card-column>
-    <kd-resource-card-column ng-if="$ctrl.areMultipleNamespacesSelected()">
+    <kd-resource-card-column>
       <div>
-        <kd-middle-ellipsis display-string="{{::$ctrl.release.objectMeta.namespace}}">
+        <kd-middle-ellipsis display-string="{{::$ctrl.release.status}}">
         </kd-middle-ellipsis>
       </div>
     </kd-resource-card-column>
-    <kd-resource-card-column>
-      <kd-labels labels="::$ctrl.release.objectMeta.labels"></kd-labels>
-    </kd-resource-card-column>
-    <kd-resource-card-column>
-      <span class="kd-replicase-card-pods-stat">
-        {{::$ctrl.release.pods.running}} /
-        {{::$ctrl.release.pods.desired}}
-      </span>
-    </kd-resource-card-column>
-    <kd-resource-card-column>
-      {{::$ctrl.release.objectMeta.creationTimestamp | relativeTime}}
-      <md-tooltip>
-        {{::$ctrl.getCreatedAtTooltip($ctrl.release.objectMeta.creationTimestamp)}}
-      </md-tooltip>
-    </kd-resource-card-column>
-    <kd-resource-card-column>
-      <div ng-repeat="image in ::$ctrl.release.containerImages track by $index">
-        <kd-middle-ellipsis display-string="{{::image}}"></kd-middle-ellipsis>
+    <kd-resource-card-column ng-if="$ctrl.areMultipleNamespacesSelected()">
+      <div>
+        <kd-middle-ellipsis display-string="{{::$ctrl.release.namespace}}">
+        </kd-middle-ellipsis>
       </div>
     </kd-resource-card-column>
     <kd-resource-card-column class="kd-row-layout-column kd-icon-column">

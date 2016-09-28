@@ -20,7 +20,6 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
 
 	heapster "github.com/kubernetes/dashboard/src/app/backend/client"
-	k8serrors "k8s.io/kubernetes/pkg/api/errors"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 
 	"github.com/kubernetes/dashboard/src/app/backend/resource/dataselect"
@@ -55,33 +54,6 @@ func GetReleaseList(client client.Interface, nsQuery *common.NamespaceQuery,
 func GetReleaseListFromChannels(channels *common.ResourceChannels,
 	dsQuery *dataselect.DataSelectQuery, heapsterClient *heapster.HeapsterClient) (*ReleaseList, error) {
 
-	//releases := <-channels.ReleaseList.List
-	// TODO: Releases
-	if err := <-channels.ReleaseList.Error; err != nil {
-		statusErr, ok := err.(*k8serrors.StatusError)
-		if ok && statusErr.ErrStatus.Reason == "NotFound" {
-			// NotFound - this means that the server does not support Release objects, which
-			// is fine.
-			emptyList := &ReleaseList{
-				Releases: make([]common.Release, 0),
-			}
-			return emptyList, nil
-		}
-		return nil, err
-	}
-
-	// pods := <-channels.PodList.List
-	// TODO: Releases
-	if err := <-channels.PodList.Error; err != nil {
-		return nil, err
-	}
-
-	// events := <-channels.EventList.List
-	// TODO: Releases
-	if err := <-channels.EventList.Error; err != nil {
-		return nil, err
-	}
-
 	return CreateReleaseList([]string{"happy-panda"}), nil
 }
 
@@ -99,6 +71,7 @@ func CreateReleaseList(releases []string) *ReleaseList {
 			common.Release{
 				Name:      release,
 				Namespace: "default", // TODO: Releases
+				Status:    "DEPLOYED",
 			})
 	}
 
