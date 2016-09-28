@@ -70,7 +70,8 @@ export default class ReleaseCardController {
    * @return {boolean}
    * @export
    */
-  hasWarnings() { return this.release.pods.warnings.length > 0; }
+  hasWarnings() { return false; }
+  // TODO: Releases
 
   /**
    * Returns true if replica set pods have no warnings and there is at least one pod
@@ -78,13 +79,15 @@ export default class ReleaseCardController {
    * @return {boolean}
    * @export
    */
-  isPending() { return !this.hasWarnings() && this.release.pods.pending > 0; }
+  isPending() { return false; }
+  // TODO: Releases
 
   /**
    * @return {boolean}
    * @export
    */
-  isSuccess() { return !this.isPending() && !this.hasWarnings(); }
+  isSuccess() { return true; }
+  // TODO: Releases
 
   /**
    * @export
