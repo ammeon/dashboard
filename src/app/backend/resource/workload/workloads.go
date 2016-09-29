@@ -28,6 +28,7 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/release"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicaset"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/replicationcontroller"
+	"k8s.io/helm/pkg/helm"
 	k8sClient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
@@ -52,7 +53,8 @@ type Workloads struct {
 
 // GetWorkloads returns a list of all workloads in the cluster.
 func GetWorkloads(client *k8sClient.Client, heapsterClient client.HeapsterClient,
-	nsQuery *common.NamespaceQuery, dsQuery *dataselect.DataSelectQuery) (*Workloads, error) {
+	tiller *helm.Client, nsQuery *common.NamespaceQuery,
+	dsQuery *dataselect.DataSelectQuery) (*Workloads, error) {
 
 	log.Printf("Getting lists of all workloads")
 	channels := &common.ResourceChannels{
@@ -60,7 +62,7 @@ func GetWorkloads(client *k8sClient.Client, heapsterClient client.HeapsterClient
 		ReplicaSetList:            common.GetReplicaSetListChannel(client.Extensions(), nsQuery, 1),
 		JobList:                   common.GetJobListChannel(client.Batch(), nsQuery, 1),
 		DaemonSetList:             common.GetDaemonSetListChannel(client.Extensions(), nsQuery, 1),
-		ReleaseList:               common.GetReleaseListChannel(nsQuery, 1),
+		ReleaseList:               common.GetReleaseListChannel(tiller, nsQuery, 1),
 		DeploymentList:            common.GetDeploymentListChannel(client.Extensions(), nsQuery, 1),
 		PetSetList:                common.GetPetSetListChannel(client.Apps(), nsQuery, 1),
 		ServiceList:               common.GetServiceListChannel(client, nsQuery, 1),

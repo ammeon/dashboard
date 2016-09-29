@@ -670,8 +670,8 @@ func (apiHandler *APIHandler) handleGetWorkloads(
 
 	namespace := parseNamespacePathParameter(request)
 	dataSelect := parseDataSelectPathParameter(request)
-	result, err := workload.GetWorkloads(apiHandler.client, apiHandler.heapsterClient, namespace,
-		dataSelect)
+	result, err := workload.GetWorkloads(apiHandler.client, apiHandler.heapsterClient,
+		apiHandler.helmClient, namespace, dataSelect)
 	if err != nil {
 		handleInternalError(response, err)
 		return
@@ -788,7 +788,7 @@ func (apiHandler *APIHandler) handleGetReleases(
 	namespace := parseNamespacePathParameter(request)
 	dataSelect := parseDataSelectPathParameter(request)
 	dataSelect.MetricQuery = dataselect.StandardMetrics
-	result, err := release.GetReleaseList(apiHandler.client, namespace, dataSelect, &apiHandler.heapsterClient)
+	result, err := release.GetReleaseList(apiHandler.helmClient, namespace, dataSelect, &apiHandler.heapsterClient)
 	if err != nil {
 		handleInternalError(response, err)
 		return

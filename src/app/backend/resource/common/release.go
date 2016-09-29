@@ -15,17 +15,12 @@
 package common
 
 import (
-	"time"
+	"k8s.io/helm/pkg/proto/hapi/release"
 )
 
-type Release struct {
-	Name      string    `json:"name"`
-	Time      time.Time `json:"time"`
-	Namespace string    `json:"namespace"`
-	Status    string    `json:"status"`
-}
+type Release release.Release
 
 type ReleaseList struct {
 	// Items is the list of deployments.
-	Items []Release `json:"items"` // TODO: Releases
+	Items []Release `json:"items"`
 }
