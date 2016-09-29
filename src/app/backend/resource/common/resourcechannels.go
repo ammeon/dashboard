@@ -15,6 +15,7 @@
 package common
 
 import (
+	"k8s.io/helm/pkg/helm"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	"k8s.io/kubernetes/pkg/apis/batch"
@@ -370,8 +371,8 @@ type ReleaseListChannel struct {
 
 // GetReleaseListChannel returns a pair of channels to a Release list and errors
 // that both must be read numReads times.
-func GetReleaseListChannel(nsQuery *NamespaceQuery, numReads int) ReleaseListChannel {
-	// TODO: Pass the helm client as a param
+func GetReleaseListChannel(tiller *helm.Client, nsQuery *NamespaceQuery, numReads int) ReleaseListChannel {
+	// TODO: Grab list of releases from helm client
 
 	channel := ReleaseListChannel{
 		List:  make(chan *ReleaseList, numReads),

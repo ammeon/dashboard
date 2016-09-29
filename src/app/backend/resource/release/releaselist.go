@@ -20,10 +20,10 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
 
 	heapster "github.com/kubernetes/dashboard/src/app/backend/client"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
 
 	"github.com/kubernetes/dashboard/src/app/backend/resource/dataselect"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/metric"
+	"k8s.io/helm/pkg/helm"
 )
 
 // ReleaseList contains a list of Releases in the cluster.
@@ -36,14 +36,12 @@ type ReleaseList struct {
 }
 
 // GetReleaseList returns a list of all Releases in the cluster.
-func GetReleaseList(client client.Interface, nsQuery *common.NamespaceQuery,
+func GetReleaseList(tiller *helm.Client, nsQuery *common.NamespaceQuery,
 	dsQuery *dataselect.DataSelectQuery, heapsterClient *heapster.HeapsterClient) (*ReleaseList, error) {
 	log.Printf("Getting list of all releases in the cluster")
 
 	channels := &common.ResourceChannels{
-		ReleaseList: common.GetReleaseListChannel(nsQuery, 1),
-		PodList:     common.GetPodListChannel(client, nsQuery, 1),
-		EventList:   common.GetEventListChannel(client, nsQuery, 1),
+		ReleaseList: common.GetReleaseListChannel(tiller, nsQuery, 1),
 	}
 
 	return GetReleaseListFromChannels(channels, dsQuery, heapsterClient)
@@ -71,7 +69,7 @@ func CreateReleaseList(releases []string) *ReleaseList {
 			common.Release{
 				Name:      release,
 				Namespace: "default", // TODO: Releases
-				Status:    "DEPLOYED",
+				//Status:    "DEPLOYED",
 			})
 	}
 

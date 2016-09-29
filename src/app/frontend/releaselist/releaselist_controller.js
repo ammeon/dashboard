@@ -35,5 +35,5 @@ export class ReleaseListController {
    * @return {boolean}
    * @export
    */
-  shouldShowZeroState() { return this.releaseList.releases.length === 0; }
+  shouldShowZeroState() { return this.releaseList.items.length === 0; }
 }

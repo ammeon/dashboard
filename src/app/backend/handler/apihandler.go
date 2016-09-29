@@ -859,7 +859,8 @@ func (apiHandler *APIHandler) handleGetWorkloads(
 	request *restful.Request, response *restful.Response) {
 
 	namespace := parseNamespacePathParameter(request)
-	result, err := workload.GetWorkloads(apiHandler.client, apiHandler.heapsterClient, namespace, dataselect.StandardMetrics)
+	result, err := workload.GetWorkloads(apiHandler.client, apiHandler.heapsterClient,
+		apiHandler.helmClient, namespace, dataSelect.StandardMetrics)
 	if err != nil {
 		handleInternalError(response, err)
 		return
@@ -1016,7 +1017,7 @@ func (apiHandler *APIHandler) handleGetReleases(
 	namespace := parseNamespacePathParameter(request)
 	dataSelect := parseDataSelectPathParameter(request)
 	dataSelect.MetricQuery = dataselect.StandardMetrics
-	result, err := release.GetReleaseList(apiHandler.client, namespace, dataSelect, &apiHandler.heapsterClient)
+	result, err := release.GetReleaseList(apiHandler.helmClient, namespace, dataSelect, &apiHandler.heapsterClient)
 	if err != nil {
 		handleInternalError(response, err)
 		return

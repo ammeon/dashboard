@@ -28,8 +28,6 @@ func (self ReleaseCell) GetProperty(name dataselect.PropertyName) dataselect.Com
 	switch name {
 	case dataselect.NameProperty:
 		return dataselect.StdComparableString(self.Name)
-	case dataselect.CreationTimestampProperty:
-		return dataselect.StdComparableTime(self.Time)
 	case dataselect.NamespaceProperty:
 		return dataselect.StdComparableString(self.Namespace)
 	default:
