@@ -17,7 +17,7 @@ package release
 import (
 	"log"
 
-	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
+	"k8s.io/helm/pkg/proto/hapi/release"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
@@ -32,12 +32,12 @@ func GetReleaseDetail(client client.Interface, namespace string,
 	name string) (*ReleaseDetail, error) {
 
 	log.Printf("Getting details of %s release in %s namespace", name, namespace)
-	release := &common.Release{}
+	release := &release.Release{}
 
 	return getReleaseDetail(release), nil
 }
 
-func getReleaseDetail(release *common.Release) *ReleaseDetail {
+func getReleaseDetail(release *release.Release) *ReleaseDetail {
 	return &ReleaseDetail{
 		Name:   "happy-panda", // TODO: Releases
 		Status: "DEPLOYED",    // TODO: Releases

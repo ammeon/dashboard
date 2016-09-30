@@ -18,9 +18,7 @@ import (
 	"k8s.io/helm/pkg/proto/hapi/release"
 )
 
-type Release release.Release
-
 type ReleaseList struct {
 	// Items is the list of deployments.
-	Items []Release `json:"items"`
+	Items []*release.Release `json:"items"`
 }
