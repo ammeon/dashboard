@@ -18,11 +18,12 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/common"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/dataselect"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/metric"
+	"k8s.io/helm/pkg/proto/hapi/release"
 )
 
 // The code below allows to perform complex data section on []extensions.Release
 
-type ReleaseCell common.Release
+type ReleaseCell release.Release
 
 func (self ReleaseCell) GetProperty(name dataselect.PropertyName) dataselect.ComparableValue {
 	switch name {
@@ -45,7 +46,7 @@ func (self ReleaseCell) GetResourceSelector() *metric.ResourceSelector {
 	}
 }
 
-func toCells(std []common.Release) []dataselect.DataCell {
+func toCells(std []release.Release) []dataselect.DataCell {
 	cells := make([]dataselect.DataCell, len(std))
 	for i := range std {
 		cells[i] = ReleaseCell(std[i])
@@ -53,10 +54,10 @@ func toCells(std []common.Release) []dataselect.DataCell {
 	return cells
 }
 
-func fromCells(cells []dataselect.DataCell) []common.Release {
-	std := make([]common.Release, len(cells))
+func fromCells(cells []dataselect.DataCell) []release.Release {
+	std := make([]release.Release, len(cells))
 	for i := range std {
-		std[i] = common.Release(cells[i].(ReleaseCell))
+		std[i] = release.Release(cells[i].(ReleaseCell))
 	}
 	return std
 }

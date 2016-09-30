@@ -24,6 +24,7 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/dataselect"
 	"github.com/kubernetes/dashboard/src/app/backend/resource/metric"
 	"k8s.io/helm/pkg/helm"
+	"k8s.io/helm/pkg/proto/hapi/release"
 )
 
 // ReleaseList contains a list of Releases in the cluster.
@@ -31,8 +32,8 @@ type ReleaseList struct {
 	ListMeta common.ListMeta `json:"listMeta"`
 
 	// Unordered list of Releases.
-	Releases          []common.Release `json:"releases"`
-	CumulativeMetrics []metric.Metric  `json:"cumulativeMetrics"`
+	Releases          []*release.Release `json:"releases"`
+	CumulativeMetrics []metric.Metric    `json:"cumulativeMetrics"`
 }
 
 // GetReleaseList returns a list of all Releases in the cluster.
@@ -52,27 +53,21 @@ func GetReleaseList(tiller *helm.Client, nsQuery *common.NamespaceQuery,
 func GetReleaseListFromChannels(channels *common.ResourceChannels,
 	dsQuery *dataselect.DataSelectQuery, heapsterClient *heapster.HeapsterClient) (*ReleaseList, error) {
 
-	return CreateReleaseList([]string{"happy-panda"}), nil
+	releases := <-channels.ReleaseList.List
+	if err := <-channels.ReleaseList.Error; err != nil {
+		return nil, err
+	}
+
+	return CreateReleaseList(releases.Items), nil
 }
 
 // CreateReleaseList returns a list of all Release model objects in the cluster, based on all
 // Kubernetes Release API objects.
-func CreateReleaseList(releases []string) *ReleaseList {
+func CreateReleaseList(releases []*release.Release) *ReleaseList {
 	releaseList := &ReleaseList{
-		Releases: make([]common.Release, 0),
-		ListMeta: common.ListMeta{TotalItems: len(releases)},
+		Releases:          releases,
+		ListMeta:          common.ListMeta{TotalItems: len(releases)},
+		CumulativeMetrics: []metric.Metric{},
 	}
-
-	for _, release := range releases {
-
-		releaseList.Releases = append(releaseList.Releases,
-			common.Release{
-				Name:      release,
-				Namespace: "default", // TODO: Releases
-				//Status:    "DEPLOYED",
-			})
-	}
-
-	releaseList.CumulativeMetrics = []metric.Metric{}
 	return releaseList
 }
