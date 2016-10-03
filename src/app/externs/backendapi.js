@@ -581,7 +581,7 @@ backendApi.ReleaseInfo;
 
 /**
  * @typedef {{
- *   seconds: !string,
+ *   seconds: !number,
  * }}
  */
 backendApi.ReleaseLastDeployedInfo;

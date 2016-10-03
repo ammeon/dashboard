@@ -78,9 +78,7 @@ export default class ReleaseCardController {
    * @export
    */
   getReleaseRelativeTime() {
-    // TODO: fix this to return relative time
-    //return (new Date()).getTime() - this.release.info.last_deployed.seconds;
-    return this.release.info.last_deployed.seconds;
+    return String((new Date()).getTime() - this.release.info.last_deployed.seconds);
   }
 
   /**
