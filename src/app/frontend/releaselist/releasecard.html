@@ -41,15 +41,27 @@ limitations under the License.
         </a>
       </div>
     </kd-resource-card-column>
-    <kd-resource-card-column>
-      <div>
-        <kd-middle-ellipsis display-string="{{::$ctrl.release.status}}">
-        </kd-middle-ellipsis>
-      </div>
-    </kd-resource-card-column>
     <kd-resource-card-column ng-if="$ctrl.areMultipleNamespacesSelected()">
       <div>
         <kd-middle-ellipsis display-string="{{::$ctrl.release.namespace}}">
+        </kd-middle-ellipsis>
+      </div>
+    </kd-resource-card-column>
+    <kd-resource-card-column>
+      <div>
+          <kd-middle-ellipsis display-string="{{::$ctrl.release.chart.metadata.name}}:{{::$ctrl.release.chart.metadata.version}}">
+        </kd-middle-ellipsis>
+      </div>
+    </kd-resource-card-column>
+    <kd-resource-card-column>
+      <div>
+          <kd-middle-ellipsis display-string="{{::$ctrl.getReleaseStatus()}}">
+        </kd-middle-ellipsis>
+      </div>
+    </kd-resource-card-column>
+    <kd-resource-card-column>
+      <div>
+          <kd-middle-ellipsis display-string="{{::$ctrl.getReleaseRelativeTime() | relativeTime}}">
         </kd-middle-ellipsis>
       </div>
     </kd-resource-card-column>
