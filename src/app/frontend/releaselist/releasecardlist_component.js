@@ -54,10 +54,16 @@ const i18n = {
   /** @export {string} @desc Label 'Name' which appears as a column label in the table of
       releases (release list view). */
   MSG_RELEASE_LIST_NAME_LABEL: goog.getMsg('Name'),
-  /** @export {string} @desc Label 'Status' which appears as a column label in the
-      table of releases (release list view). */
-  MSG_RELEASE_LIST_STATUS_LABEL: goog.getMsg('Status'),
   /** @export {string} @desc Label 'Namespace' which appears as a column label in the
       table of releases (release list view). */
   MSG_RELEASE_LIST_NAMESPACE_LABEL: goog.getMsg('Namespace'),
+  /** @export {string} @desc Label 'Chart' which appears as a column label in the
+      table of releases (release list view). */
+  MSG_RELEASE_LIST_CHART_LABEL: goog.getMsg('Chart'),
+  /** @export {string} @desc Label 'Status' which appears as a column label in the
+      table of releases (release list view). */
+  MSG_RELEASE_LIST_STATUS_LABEL: goog.getMsg('Status'),
+  /** @export {string} @desc Label 'Age' which appears as a column label in the
+      table of releases (release list view). */
+  MSG_RELEASE_LIST_AGE_LABEL: goog.getMsg('Age'),
 };

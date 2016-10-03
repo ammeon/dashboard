@@ -14,6 +14,7 @@
 
 import {stateName as configMapState} from 'configmaplist/configmaplist_state';
 import {stateName as daemonSetState} from 'daemonsetlist/daemonsetlist_state';
+import {stateName as releaseState} from 'releaselist/releaselist_state';
 import {stateName as deploymentState} from 'deploymentlist/deploymentlist_state';
 import {stateName as jobState} from 'joblist/joblist_state';
 import {stateName as namespaceState} from 'namespacelist/namespacelist_state';
@@ -47,6 +48,7 @@ export class NavController {
       'node': nodeState,
       'workload': workloadState,
       'pod': podState,
+      'release': releaseState,
       'deployment': deploymentState,
       'replicaSet': replicaSetState,
       'replicationController': replicationControllerState,

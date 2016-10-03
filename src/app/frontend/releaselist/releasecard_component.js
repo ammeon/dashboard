@@ -62,7 +62,23 @@ export default class ReleaseCardController {
   getReleaseDetailHref() {
     return this.state_.href(
         stateName,
-        new StateParams(this.release.objectMeta.namespace, this.release.objectMeta.name));
+        new StateParams(this.release.namespace, this.release.name));
+  }
+
+  /**
+   * @return {string}
+   * @export
+   */
+  getReleaseStatus() {
+    return statusCodes[this.release.info.status.code];
+  }
+
+  /**
+   * @return {string}
+   * @export
+   */
+  getReleaseRelativeTime() {
+    return (new Date()).getTime() - this.release.info.last_deployed.seconds;
   }
 
   /**
@@ -113,6 +129,10 @@ export const releaseCardComponent = {
   },
   controller: ReleaseCardController,
   templateUrl: 'releaselist/releasecard.html',
+};
+
+const statusCodes = {
+    1: "DEPLOYED"
 };
 
 const i18n = {
