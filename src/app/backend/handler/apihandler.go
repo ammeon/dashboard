@@ -47,6 +47,7 @@ import (
 	"github.com/kubernetes/dashboard/src/app/backend/resource/workload"
 	"github.com/kubernetes/dashboard/src/app/backend/validation"
 	"k8s.io/helm/pkg/helm"
+	helmrelease "k8s.io/helm/pkg/proto/hapi/release"
 	clientK8s "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 	"k8s.io/kubernetes/pkg/runtime"
@@ -240,7 +241,7 @@ func CreateHTTPAPIHandler(client *clientK8s.Client, heapsterClient client.Heapst
 	apiV1Ws.Route(
 		apiV1Ws.GET("/release/{namespace}/{release}").
 			To(apiHandler.handleGetReleaseDetail).
-			Writes(release.ReleaseDetail{}))
+			Writes(helmrelease.Release{}))
 
 	apiV1Ws.Route(
 		apiV1Ws.GET("/deployment").
@@ -803,7 +804,7 @@ func (apiHandler *APIHandler) handleGetReleaseDetail(
 
 	namespace := request.PathParameter("namespace")
 	name := request.PathParameter("release")
-	result, err := release.GetReleaseDetail(apiHandler.client, namespace, name)
+	result, err := release.GetReleaseDetail(apiHandler.helmClient, namespace, name)
 	if err != nil {
 		handleInternalError(response, err)
 		return
