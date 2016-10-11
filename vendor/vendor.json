@@ -19,6 +19,12 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "r5gN2tSjhBai4+L09cD6dpOcvNw=",
+			"path": "github.com/Masterminds/semver",
+			"revision": "5c3d97626126d05b4b3b5f11b0a001d67d9267e2",
+			"revisionTime": "2016-09-13T19:04:16Z"
+		},
+		{
 			"checksumSHA1": "5LSIi2TfMDCCbQIumQi/+tweI5o=",
 			"origin": "k8s.io/kubernetes/vendor/github.com/Microsoft/go-winio",
 			"path": "github.com/Microsoft/go-winio",
@@ -1775,6 +1781,60 @@
 			"revisionTime": "2016-06-21T01:10:02Z"
 		},
 		{
+			"checksumSHA1": "fFnEuPOdBRf9AdTSpAFkd0ZPXXs=",
+			"path": "golang.org/x/crypto/cast5",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "dS92E6V//Jo7eHs2aD6w4pdFgE0=",
+			"path": "golang.org/x/crypto/openpgp",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "hv904NllALnNTsusVaaV8mvpMWU=",
+			"path": "golang.org/x/crypto/openpgp/armor",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "U5J5XRyMVK1gtw5z7CEvVgsXLpg=",
+			"path": "golang.org/x/crypto/openpgp/clearsign",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "uWrWNV8Einsfmhf0T6d3wAzapwI=",
+			"path": "golang.org/x/crypto/openpgp/elgamal",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "rlxVSaGgqdAgwblsErxTxIfuGfg=",
+			"path": "golang.org/x/crypto/openpgp/errors",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "Ofe+w6eT6J4uear+deDGKFTlxJ4=",
+			"path": "golang.org/x/crypto/openpgp/packet",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "PwdkQ+WNRYvsBJ2ls0NIOEBHp1g=",
+			"path": "golang.org/x/crypto/openpgp/s2k",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
+			"checksumSHA1": "EgQZuRyaRp6ZlLNpVaKP22e97BY=",
+			"path": "golang.org/x/crypto/ripemd160",
+			"revision": "dc7f3af03ebbba4b0c90f8d95c682dba7d4c70f5",
+			"revisionTime": "2016-10-06T00:24:36Z"
+		},
+		{
 			"checksumSHA1": "UgMxHrZZOYuHkmACH7sR55ujNjA=",
 			"origin": "k8s.io/kubernetes/vendor/golang.org/x/exp/inotify",
 			"path": "golang.org/x/exp/inotify",
@@ -2108,10 +2168,16 @@
 			"revisionTime": "2016-09-07T03:25:57Z"
 		},
 		{
-			"checksumSHA1": "PxHxzbPvnyxZhYycz5EIKVwr5ic=",
+			"checksumSHA1": "q1+Big/JNbS7mT28+iXx1onspEs=",
+			"path": "k8s.io/helm/pkg/provenance",
+			"revision": "36ec1901ebd68ae976fa8ef332ca5ed44598fc24",
+			"revisionTime": "2016-10-10T22:08:00Z"
+		},
+		{
+			"checksumSHA1": "1/o0Qvyo/kWI8OsMkfB7sDNBSqo=",
 			"path": "k8s.io/helm/pkg/repo",
-			"revision": "b56cdbc3da4c59ee45aa96bc9cc08ae54af7500c",
-			"revisionTime": "2016-09-13T16:32:20Z"
+			"revision": "36ec1901ebd68ae976fa8ef332ca5ed44598fc24",
+			"revisionTime": "2016-10-10T22:08:00Z"
 		},
 		{
 			"checksumSHA1": "3aifxchWbPIHJ+zo7+cr0BPj5Ww=",
