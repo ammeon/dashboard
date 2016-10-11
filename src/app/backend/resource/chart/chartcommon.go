@@ -1,10 +1,14 @@
 package chart
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"k8s.io/helm/cmd/helm/downloader"
+	"k8s.io/helm/cmd/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
 )
 
@@ -20,28 +24,6 @@ func homePath() string {
 	return "/.helm"
 }
 
-func repositoryDirectory() string {
-	return homePath() + "/" + repositoryDir
-}
-
-func cacheDirectory(paths ...string) string {
-	fragments := append([]string{repositoryDirectory(), cachePath}, paths...)
-	return filepath.Join(fragments...)
-}
-
-func cacheIndexFile(repoName string) string {
-	return cacheDirectory(repoName + "-index.yaml")
-}
-
-func localRepoDirectory(paths ...string) string {
-	fragments := append([]string{repositoryDirectory(), localRepoPath}, paths...)
-	return filepath.Join(fragments...)
-}
-
-func repositoriesFile() string {
-	return filepath.Join(repositoryDirectory(), repositoriesFilePath)
-}
-
 var (
 	stableRepository    = "kubernetes-charts"
 	stableRepositoryURL = "http://storage.googleapis.com/kubernetes-charts"
@@ -52,8 +34,8 @@ var (
 // ensureHome checks to see if $HELM_HOME exists
 //
 // If $HELM_HOME does not exist, this function will create it.
-func ensureHome() error {
-	configDirectories := []string{homePath(), repositoryDirectory(), cacheDirectory(), localRepoDirectory()}
+func ensureHome(home helmpath.Home) error {
+	configDirectories := []string{home.String(), home.Repository(), home.Cache(), home.LocalRepository()}
 	for _, p := range configDirectories {
 		if fi, err := os.Stat(p); err != nil {
 			fmt.Printf("Creating %s \n", p)
@@ -65,7 +47,7 @@ func ensureHome() error {
 		}
 	}
 
-	repoFile := repositoriesFile()
+	repoFile := home.RepositoryFile()
 	if fi, err := os.Stat(repoFile); err != nil {
 		fmt.Printf("Creating %s \n", repoFile)
 		r := repo.NewRepoFile()
@@ -77,13 +59,13 @@ func ensureHome() error {
 		if err := r.WriteFile(repoFile, 0644); err != nil {
 			return err
 		}
-		cif := cacheIndexFile(stableRepository)
+		cif := home.CacheIndex(stableRepository)
 		if err := repo.DownloadIndexFile(stableRepository, stableRepositoryURL, cif); err != nil {
 			fmt.Printf("WARNING: Failed to download %s: %s (run 'helm repo update')\n", stableRepository, err)
 		}
 
 		// TODO: Remove this and add custom chart repos, from an add repo dialog
-		if err := addRepo(customRepository, customRepositoryURL); err != nil {
+		if err := addRepository(customRepository, customRepositoryURL, home); err != nil {
 			return err
 		}
 
@@ -99,4 +81,54 @@ func ensureHome() error {
 
 	fmt.Printf("$HELM_HOME has been configured at %s.\n", homePath())
 	return nil
+}
+
+func locateChartPath(name, version string, verify bool, keyring string) (string, error) {
+	helmHome := helmpath.Home(homePath())
+	name = strings.TrimSpace(name)
+	version = strings.TrimSpace(version)
+	if fi, err := os.Stat(name); err == nil {
+		abs, err := filepath.Abs(name)
+		if err != nil {
+			return abs, err
+		}
+		if verify {
+			if fi.IsDir() {
+				return "", errors.New("cannot verify a directory")
+			}
+			if _, err := downloader.VerifyChart(abs, keyring); err != nil {
+				return "", err
+			}
+		}
+		return abs, nil
+	}
+	if filepath.IsAbs(name) || strings.HasPrefix(name, ".") {
+		return name, fmt.Errorf("path %q not found", name)
+	}
+
+	crepo := filepath.Join(helmHome.Repository(), name)
+	if _, err := os.Stat(crepo); err == nil {
+		return filepath.Abs(crepo)
+	}
+
+	dl := downloader.ChartDownloader{
+		HelmHome: helmHome,
+		Out:      os.Stdout,
+		Keyring:  keyring,
+	}
+	if verify {
+		dl.Verify = downloader.VerifyAlways
+	}
+
+	filename, _, err := dl.DownloadTo(name, version, ".")
+	if err == nil {
+		lname, err := filepath.Abs(filename)
+		if err != nil {
+			return filename, err
+		}
+		fmt.Printf("Fetched %s to %s\n", name, filename)
+		return lname, nil
+	}
+
+	return filename, fmt.Errorf("file %q not found", name)
 }

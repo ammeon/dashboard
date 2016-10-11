@@ -2,10 +2,10 @@ package chart
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
+	"k8s.io/helm/cmd/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
 )
 
@@ -41,16 +41,18 @@ type ChartSpec struct {
 
 // AddRepository adds a repository.
 func AddRepository(spec *RepositorySpec) error {
-	return addRepo(spec.RepoName, spec.RepoUrl)
+	helmHome := helmpath.Home(homePath())
+	return addRepository(spec.RepoName, spec.RepoUrl, helmHome)
 }
 
 // GetRepositoryList get a list of repository.
 func GetRepositoryList() (*RepositoryListSpec, error) {
-	ensureHome()
+	helmHome := helmpath.Home(homePath())
+	ensureHome(helmHome)
 	repoList := &RepositoryListSpec{
 		RepoNames: make([]string, 0),
 	}
-	f, err := repo.LoadRepositoriesFile(repositoriesFile())
+	f, err := repo.LoadRepositoriesFile(helmHome.RepositoryFile())
 	if err != nil {
 		return repoList, err
 	}
@@ -62,10 +64,11 @@ func GetRepositoryList() (*RepositoryListSpec, error) {
 
 // GetRepositoryCharts get charts in a repository.
 func GetRepositoryCharts(repoName string) (*RepositoryChartListSpec, error) {
+	helmHome := helmpath.Home(homePath())
 	chartList := &RepositoryChartListSpec{
 		Charts: make([]ChartSpec, 0),
 	}
-	i, err := repo.LoadIndexFile(cacheIndexFile(repoName))
+	i, err := repo.LoadIndexFile(helmHome.CacheIndex(repoName))
 	if err != nil {
 		return chartList, err
 	}
@@ -103,17 +106,17 @@ func index(dir, url string) error {
 	return chartRepo.Index()
 }
 
-func addRepo(name, url string) error {
-	cif := cacheIndexFile(name)
+func addRepository(name, url string, home helmpath.Home) error {
+	cif := home.CacheIndex(name)
 	if err := repo.DownloadIndexFile(name, url, cif); err != nil {
 		return fmt.Errorf("Looks like %q is not a valid chart repository or cannot be reached: %s", url, err.Error())
 	}
 
-	return insertRepoLine(name, url)
+	return insertRepoLine(name, url, home)
 }
 
-func removeRepoLine(out io.Writer, name string) error {
-	repoFile := repositoriesFile()
+func removeRepoLine(name string, home helmpath.Home) error {
+	repoFile := home.RepositoryFile()
 	r, err := repo.LoadRepositoriesFile(repoFile)
 	if err != nil {
 		return err
@@ -126,18 +129,18 @@ func removeRepoLine(out io.Writer, name string) error {
 		return err
 	}
 
-	if err := removeRepoCache(name); err != nil {
+	if err := removeRepoCache(name, home); err != nil {
 		return err
 	}
 
-	fmt.Fprintf(out, "%q has been removed from your repositories", name)
+	fmt.Printf("%q has been removed from your repositories", name)
 
 	return nil
 }
 
-func removeRepoCache(name string) error {
-	if _, err := os.Stat(cacheIndexFile(name)); err == nil {
-		err = os.Remove(cacheIndexFile(name))
+func removeRepoCache(name string, home helmpath.Home) error {
+	if _, err := os.Stat(home.CacheIndex(name)); err == nil {
+		err = os.Remove(home.CacheIndex(name))
 		if err != nil {
 			return err
 		}
@@ -145,9 +148,9 @@ func removeRepoCache(name string) error {
 	return nil
 }
 
-func insertRepoLine(name, url string) error {
-	cif := cacheIndexFile(name)
-	f, err := repo.LoadRepositoriesFile(repositoriesFile())
+func insertRepoLine(name, url string, home helmpath.Home) error {
+	cif := home.CacheIndex(name)
+	f, err := repo.LoadRepositoriesFile(home.RepositoryFile())
 	if err != nil {
 		return err
 	}
@@ -160,5 +163,5 @@ func insertRepoLine(name, url string) error {
 		URL:   url,
 		Cache: filepath.Base(cif),
 	})
-	return f.WriteFile(repositoriesFile(), 0644)
+	return f.WriteFile(home.RepositoryFile(), 0644)
 }

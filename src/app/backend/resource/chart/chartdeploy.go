@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"k8s.io/helm/cmd/helm/helmpath"
 	"k8s.io/helm/pkg/helm"
 )
 
@@ -38,19 +39,25 @@ type AppDeploymentFromChartResponse struct {
 func DeployChart(spec *AppDeploymentFromChartSpec, helmClient *helm.Client) error {
 	log.Printf("Deploying chart %s with release name %s", spec.ChartURL, spec.ReleaseName)
 
-	if err := ensureHome(); err != nil {
+	if err := ensureHome(helmpath.Home(homePath())); err != nil {
 		log.Printf("No helm home setup: %s", err)
 		return err
 	}
 
-	log.Printf("chartPath is: %q", spec.ChartURL)
+	chartPath, err := locateChartPath(spec.ChartURL, "", false, "")
+	if err != nil {
+		log.Printf("Failed to find chart: %s", err)
+		return err
+	}
+	log.Printf("chartPath is: %q", chartPath)
+	log.Printf("namespace is: %q", spec.Namespace)
 
 	if helmClient == nil {
 		return fmt.Errorf("No helm client available to deploy chart.")
 	}
 
 	res, err := helmClient.InstallRelease(
-		spec.ChartURL,
+		chartPath,
 		spec.Namespace,
 		helm.ValueOverrides(nil),
 		helm.ReleaseName(spec.ReleaseName),

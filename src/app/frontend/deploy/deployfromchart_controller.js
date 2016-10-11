@@ -109,6 +109,7 @@ export default class DeployFromChartController {
       let deploymentSpec = {
         chartURL: this.selectedChart,
         releaseName: this.name,
+        namespace: "default",
       };
       let defer = this.q_.defer();
 
