@@ -2126,10 +2126,27 @@
 			"revisionTime": "2016-06-30T10:29:59Z"
 		},
 		{
-			"checksumSHA1": "q8kjewAMfIVZJK8dmThlvNk8vpA=",
+			"path": "k8s.io/helm/cmd/helm/downloader",
+			"revision": "7a5ee459f7f1daf5ae76dc80f7ee27c00be9d00e",
+			"revisionTime": "2016-10-11T16:18:08Z"
+		},
+		{
+			"checksumSHA1": "rM6bIph6Fv/nBDE0S4phKv5QUkM=",
+			"path": "k8s.io/helm/cmd/helm/helmpath",
+			"revision": "7a5ee459f7f1daf5ae76dc80f7ee27c00be9d00e",
+			"revisionTime": "2016-10-11T16:18:08Z"
+		},
+		{
+			"checksumSHA1": "JYZDRu5hv18PZfJxRS9BV3bNW+s=",
+			"path": "k8s.io/helm/cmd/helm/resolver",
+			"revision": "7a5ee459f7f1daf5ae76dc80f7ee27c00be9d00e",
+			"revisionTime": "2016-10-11T16:18:08Z"
+		},
+		{
+			"checksumSHA1": "IMCfQzGzHgeWlg85OfllUVpgjn0=",
 			"path": "k8s.io/helm/pkg/chartutil",
-			"revision": "36606cf152def70c968b2737d7dc040b21c6d9ac",
-			"revisionTime": "2016-09-07T03:25:57Z"
+			"revision": "7a5ee459f7f1daf5ae76dc80f7ee27c00be9d00e",
+			"revisionTime": "2016-10-11T16:18:08Z"
 		},
 		{
 			"checksumSHA1": "Amy7+QdlVL1FLo28G5Og5COzIl8=",
@@ -2178,6 +2195,10 @@
 			"path": "k8s.io/helm/pkg/repo",
 			"revision": "36ec1901ebd68ae976fa8ef332ca5ed44598fc24",
 			"revisionTime": "2016-10-10T22:08:00Z"
+		},
+		{
+			"path": "k8s.io/helm/pkg/repo/repotest",
+			"revision": "36ec1901ebd68ae976fa8ef332ca5ed44598fc24"
 		},
 		{
 			"checksumSHA1": "3aifxchWbPIHJ+zo7+cr0BPj5Ww=",
