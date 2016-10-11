@@ -52,6 +52,6 @@ push-image:
 
 # Serve dashboard locally
 serve:
-	ps aux | grep "kubectl proxy" | grep -v "grep" | cut -d " " -f3 | xargs -r kill -9
+	ps a | grep "kubectl proxy" | grep -v "grep" | cut -d " " -f2 | xargs -r kill -9
 	kubectl proxy --port=8080 &
 	$(dk_run) $(gulp_cmd) serve
