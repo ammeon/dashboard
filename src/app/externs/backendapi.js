@@ -630,6 +630,31 @@ backendApi.ReleaseDetail;
 
 /**
  * @typedef {{
+ *   repoNames: !Array<string>,
+ * }}
+ */
+backendApi.RepositoryList;
+
+/**
+ * @typedef {{
+ *   charts: !Array<!backendApi.Chart>,
+ * }}
+ */
+backendApi.ChartList;
+
+/**
+ * @typedef {{
+ *   name: string,
+ *   version: string,
+ *   fullURL: string,
+ *   description: string,
+ *   icon: string,
+ * }}
+ */
+backendApi.Chart;
+
+/**
+ * @typedef {{
  *   pods: !Array<!backendApi.Pod>,
  *   listMeta: !backendApi.ListMeta,
  *   cumulativeMetrics: (!Array<!backendApi.Metric>|null),

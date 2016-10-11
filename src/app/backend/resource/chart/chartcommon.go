@@ -80,8 +80,8 @@ func ensureHome() error {
 		if err := addRepo(defaultRepository, defaultRepositoryURL); err != nil {
 			return err
 		}
-		// Add custom repos
-		if err := addRepo("aia-repo", "http://172.19.29.166:8879/charts"); err != nil {
+		// TODO: Remove this and add custom chart repos, from an add repo dialog
+		if err := addRepo("ammeon-charts", "http://172.19.29.166:8879/charts"); err != nil {
 			return err
 		}
 

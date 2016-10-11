@@ -28,35 +28,65 @@ type RepositoryListSpec struct {
 // RepositoryListSpec is a specification for a repository.
 type RepositoryChartListSpec struct {
 	// List of charts.
-	Charts []ChartSpec `json:"chartNames"`
+	Charts []ChartSpec `json:"charts"`
 }
 
 // Chartspec representation view of a chart.
 type ChartSpec struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
-	FullName    string `json:"fullName"`
+	FullURL     string `json:"fullURL"`
 	Description string `json:"description"`
+	Icon        string `json:"icon"`
 }
 
 // AddRepository adds a repository.
 func AddRepository(spec *RepositorySpec) error {
-	return addRepo("aia-repo", "http://172.19.29.166:8879/charts")
+	return addRepo(spec.RepoName, spec.RepoUrl)
 }
 
 // GetRepositoryList get a list of repository.
 func GetRepositoryList() (*RepositoryListSpec, error) {
+	ensureHome()
 	repoList := &RepositoryListSpec{
 		RepoNames: make([]string, 0),
 	}
-	repoList.RepoNames = append(repoList.RepoNames, "k8s-charts")
+	f, err := repo.LoadRepositoriesFile(repositoriesFile())
+	if err != nil {
+		return repoList, err
+	}
+	for repoName, _ := range f.Repositories {
+		repoList.RepoNames = append(repoList.RepoNames, repoName)
+	}
 	return repoList, nil
 }
 
 // GetRepositoryCharts get charts in a repository.
 func GetRepositoryCharts(repoName string) (*RepositoryChartListSpec, error) {
-	chartList := &RepositoryChartListSpec{}
-	// chartList.ChartNames = append(chartList.ChartNames, "chart1")
+	chartList := &RepositoryChartListSpec{
+		Charts: make([]ChartSpec, 0),
+	}
+	r, err := repo.LoadIndexFile(cacheIndexFile(repoName))
+	if err != nil {
+		return chartList, err
+	}
+	for _, c := range r.Entries {
+		if c.Chartfile == nil {
+			continue
+		}
+		icon := c.Chartfile.Icon
+		if icon == "" {
+			icon = "https://deis.com/assets/images/svg/helm-logo.svg"
+		}
+		chart := &ChartSpec{
+			Name:        c.Chartfile.Name,
+			Version:     c.Chartfile.Version,
+			FullURL:     c.URL,
+			Description: c.Chartfile.Description,
+			Icon:        icon,
+		}
+		chartList.Charts = append(chartList.Charts, *chart)
+	}
 	return chartList, nil
 }
 
