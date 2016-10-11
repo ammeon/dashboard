@@ -82,7 +82,10 @@ export default class DeployFromChartController {
      * List of available repository.
      * @export {!Array<string>}
      */
-    this.repos = this.getRepos();
+    this.repos = [];
+
+    /** Init the list of available repos **/
+    this.getRepos();
 
     /** @export */
     this.selectedRepo = "";
