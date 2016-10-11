@@ -104,7 +104,7 @@ export default class DeployFromChartController {
     if (this.form.$valid) {
       /** @type {!backendApi.AppDeploymentFromChartSpec} */
       let deploymentSpec = {
-        chartName: this.selectedChart,
+        chartURL: this.selectedChart,
         releaseName: this.name,
       };
       let defer = this.q_.defer();
@@ -165,7 +165,12 @@ export default class DeployFromChartController {
     /** @type {!angular.Resource<!backendApi.ChartList>} */
     let resource = this.resource_(`api/v1/repository/${repo}`);
     resource.get(
-        (res) => { this.charts = res.charts; },
+        (res) => { this.charts = res.charts.sort(
+                      function(a, b) {
+                        var nameA = a.name.toUpperCase();
+                        var nameB = b.name.toUpperCase();
+                        return (nameA < nameB) ? -1 : (nameA > nameB) ? 1 : 0;
+                    }); },
         (err) => { this.log_.log(`Error getting charts: ${err}`); });
   }
 

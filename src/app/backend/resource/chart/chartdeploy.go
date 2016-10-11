@@ -9,8 +9,8 @@ import (
 
 // AppDeploymentFromChartSpec is a specification for a chart deployment.
 type AppDeploymentFromChartSpec struct {
-	// Name of the chart.
-	ChartName string `json:"chartName"`
+	// URL of the chart.
+	ChartURL string `json:"chartURL"`
 
 	// Name of the release.
 	ReleaseName string `json:"releaseName"`
@@ -21,8 +21,8 @@ type AppDeploymentFromChartSpec struct {
 
 // AppDeploymentFromChartResponse is a specification for a chart deployment.
 type AppDeploymentFromChartResponse struct {
-	// Name of the chart.
-	ChartName string `json:"chartName"`
+	// URL of the chart.
+	ChartURL string `json:"chartURL"`
 
 	// Name of the release.
 	ReleaseName string `json:"releaseName"`
@@ -36,29 +36,27 @@ type AppDeploymentFromChartResponse struct {
 
 // DeployChart deploys an chart based on the given configuration.
 func DeployChart(spec *AppDeploymentFromChartSpec, helmClient *helm.Client) error {
-	log.Printf("Deploying chart %s with release name %s", spec.ChartName, spec.ReleaseName)
+	log.Printf("Deploying chart %s with release name %s", spec.ChartURL, spec.ReleaseName)
 
 	if err := ensureHome(); err != nil {
 		log.Printf("No helm home setup: %s", err)
 		return err
 	}
 
-	chartPath, err := locateChartPath(spec.ChartName)
-	if err != nil {
-		log.Printf("Failed to find chart: %s", err)
-		return err
-	}
-	log.Printf("chartPath is: %q", chartPath)
+	log.Printf("chartPath is: %q", spec.ChartURL)
 
 	if helmClient == nil {
 		return fmt.Errorf("No helm client available to deploy chart.")
 	}
 
 	res, err := helmClient.InstallRelease(
-		chartPath,
+		spec.ChartURL,
 		spec.Namespace,
 		helm.ValueOverrides(nil),
 		helm.ReleaseName(spec.ReleaseName),
+		helm.InstallDryRun(false),
+		helm.InstallReuseName(false),
+		helm.InstallDisableHooks(false),
 	)
 	if err != nil {
 		log.Printf("Error installing release: %s", err)

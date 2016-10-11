@@ -1,12 +1,11 @@
 package chart
 
 import (
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
+	"path/filepath"
 
-	"gopkg.in/yaml.v2"
 	"k8s.io/helm/pkg/repo"
 )
 
@@ -55,8 +54,8 @@ func GetRepositoryList() (*RepositoryListSpec, error) {
 	if err != nil {
 		return repoList, err
 	}
-	for repoName, _ := range f.Repositories {
-		repoList.RepoNames = append(repoList.RepoNames, repoName)
+	for _, r := range f.Repositories {
+		repoList.RepoNames = append(repoList.RepoNames, r.Name)
 	}
 	return repoList, nil
 }
@@ -66,26 +65,32 @@ func GetRepositoryCharts(repoName string) (*RepositoryChartListSpec, error) {
 	chartList := &RepositoryChartListSpec{
 		Charts: make([]ChartSpec, 0),
 	}
-	r, err := repo.LoadIndexFile(cacheIndexFile(repoName))
+	i, err := repo.LoadIndexFile(cacheIndexFile(repoName))
 	if err != nil {
 		return chartList, err
 	}
-	for _, c := range r.Entries {
-		if c.Chartfile == nil {
-			continue
+	for _, e := range i.Entries {
+		for _, c := range e {
+			if c == nil {
+				continue
+			}
+			icon := c.Icon
+			if icon == "" {
+				icon = "https://deis.com/assets/images/svg/helm-logo.svg"
+			}
+			desc := c.Description
+			if len(desc) > 45 {
+				desc = desc[0:41] + "..."
+			}
+			chart := &ChartSpec{
+				Name:        c.Name,
+				Version:     c.Version,
+				FullURL:     c.URLs[0],
+				Description: desc,
+				Icon:        icon,
+			}
+			chartList.Charts = append(chartList.Charts, *chart)
 		}
-		icon := c.Chartfile.Icon
-		if icon == "" {
-			icon = "https://deis.com/assets/images/svg/helm-logo.svg"
-		}
-		chart := &ChartSpec{
-			Name:        c.Chartfile.Name,
-			Version:     c.Chartfile.Version,
-			FullURL:     c.URL,
-			Description: c.Chartfile.Description,
-			Icon:        icon,
-		}
-		chartList.Charts = append(chartList.Charts, *chart)
 	}
 	return chartList, nil
 }
@@ -99,36 +104,33 @@ func index(dir, url string) error {
 }
 
 func addRepo(name, url string) error {
-	if err := repo.DownloadIndexFile(name, url, cacheIndexFile(name)); err != nil {
-		return errors.New("Looks like " + url + " is not a valid chart repository or cannot be reached: " + err.Error())
+	cif := cacheIndexFile(name)
+	if err := repo.DownloadIndexFile(name, url, cif); err != nil {
+		return fmt.Errorf("Looks like %q is not a valid chart repository or cannot be reached: %s", url, err.Error())
 	}
 
 	return insertRepoLine(name, url)
 }
 
-func removeRepoLine(name string) error {
-	r, err := repo.LoadRepositoriesFile(repositoriesFile())
+func removeRepoLine(out io.Writer, name string) error {
+	repoFile := repositoriesFile()
+	r, err := repo.LoadRepositoriesFile(repoFile)
 	if err != nil {
 		return err
 	}
 
-	_, ok := r.Repositories[name]
-	if ok {
-		delete(r.Repositories, name)
-		b, err := yaml.Marshal(&r.Repositories)
-		if err != nil {
-			return err
-		}
-		if err := ioutil.WriteFile(repositoriesFile(), b, 0666); err != nil {
-			return err
-		}
-		if err := removeRepoCache(name); err != nil {
-			return err
-		}
-
-	} else {
-		return fmt.Errorf("The repository, %s, does not exist in your repositories list", name)
+	if !r.Remove(name) {
+		return fmt.Errorf("no repo named %q found", name)
 	}
+	if err := r.WriteFile(repoFile, 0644); err != nil {
+		return err
+	}
+
+	if err := removeRepoCache(name); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(out, "%q has been removed from your repositories", name)
 
 	return nil
 }
@@ -144,21 +146,19 @@ func removeRepoCache(name string) error {
 }
 
 func insertRepoLine(name, url string) error {
+	cif := cacheIndexFile(name)
 	f, err := repo.LoadRepositoriesFile(repositoriesFile())
 	if err != nil {
 		return err
 	}
-	_, ok := f.Repositories[name]
-	if ok {
+
+	if f.Has(name) {
 		return fmt.Errorf("The repository name you provided (%s) already exists. Please specify a different name.", name)
 	}
-
-	if f.Repositories == nil {
-		f.Repositories = make(map[string]string)
-	}
-
-	f.Repositories[name] = url
-
-	b, _ := yaml.Marshal(&f.Repositories)
-	return ioutil.WriteFile(repositoriesFile(), b, 0666)
+	f.Add(&repo.Entry{
+		Name:  name,
+		URL:   url,
+		Cache: filepath.Base(cif),
+	})
+	return f.WriteFile(repositoriesFile(), 0644)
 }

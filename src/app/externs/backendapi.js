@@ -87,7 +87,7 @@ backendApi.AppDeploymentSpec;
 
 /**
  * @typedef {{
- *   chartName: string,
+ *   chartURL: string,
  *   releaseName: string
  * }}
  */
